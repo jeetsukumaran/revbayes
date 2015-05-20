@@ -1,5 +1,10 @@
 #include "Parallelizable.h"
 
+
+#ifdef RB_MPI
+#include <mpi.h>
+#endif
+
 using namespace RevBayesCore;
 
 
@@ -9,17 +14,15 @@ using namespace RevBayesCore;
  * such as the number of processes, the process ID, etc.
  */
 Parallelizable::Parallelizable() :
-    activePID( 0 ),
+    offsetPID( 0 ),
     numProcesses( 1 ),
-    pid( 0 ),
-    processActive( true )
+    pid( 0 )
 {
     
     
 #ifdef RB_MPI
     //    numProcesses = MPI::COMM_WORLD.Get_size();
     pid = MPI::COMM_WORLD.Get_rank();
-    processActive = (pid == activePID);
 #endif
     
     
@@ -30,10 +33,9 @@ Parallelizable::Parallelizable() :
  * Standard copy constructor.
  */
 Parallelizable::Parallelizable( const Parallelizable &p ) :
-    activePID( p.activePID ),
+    offsetPID( p.offsetPID ),
     numProcesses( p.numProcesses ),
-    pid( p.pid ),
-    processActive( p.processActive )
+    pid( p.pid )
 {
     
 }
@@ -48,10 +50,9 @@ Parallelizable& Parallelizable::operator=(const Parallelizable &p)
     // check for self-assignment
     if ( this != &p )
     {
-        activePID       = p.activePID;
+        offsetPID       = p.offsetPID;
         numProcesses    = p.numProcesses;
         pid             = p.pid;
-        processActive   = p.processActive;
     }
     
     // return reference to myself
@@ -66,10 +67,10 @@ void Parallelizable::setNumberOfProcesses(size_t n, size_t offset)
 {
     
     numProcesses    = n;
-    activePID       = offset;
-    processActive   = (pid == activePID);
+    offsetPID       = offset;
     
     // delegate call for derived classes
+    setNumberOfProcessesSpecialized(n, offset);
 }
 
 

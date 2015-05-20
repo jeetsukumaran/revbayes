@@ -41,31 +41,6 @@ RlString::RlString(const std::string& v) : ModelObject<std::string>( new std::st
 }
 
 
-///** Constructor from int */
-//RlString::RlString(int i) : ModelObject<std::string>()
-//{
-//
-//    setGuiVariableName("String");
-//    setGuiLatexSymbol("");
-//    std::ostringstream o;
-//    o << i;
-//    dagNode = new RevBayesCore::ConstantNode<std::string>("", new std::string(o.str()) );
-//}
-//
-//
-//
-///** Constructor from RlString */
-//RlString::RlString(double x) : ModelObject<std::string>()
-//{
-//
-//    setGuiVariableName("String");
-//    setGuiLatexSymbol("");
-//    std::ostringstream o;
-//    o << x;
-//    dagNode = new RevBayesCore::ConstantNode<std::string>("", new std::string(o.str()) );
-//}
-
-
 /* Construct from DAG node */
 RlString::RlString( RevBayesCore::TypedDagNode<std::string> *v ) : ModelObject<std::string>( v )
 {
@@ -197,5 +172,15 @@ void RlString::printValue(std::ostream& o, bool toScreen) const
     {
         dagNode->printValue( o );
     }
+}
+
+
+
+/** Print value */
+void RlString::printValue(std::ostream& o) const
+{
+    
+    dagNode->printValue( o );
+    
 }
 

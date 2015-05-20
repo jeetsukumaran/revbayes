@@ -68,7 +68,7 @@ namespace RevBayesCore {
         size_t                                  numChains;
         std::vector<size_t>                     heatRanks;
 //        std::vector<std::vector<size_t> >       chainsPerProcess;
-//        std::vector<size_t>                     processPerChain;
+        std::vector<size_t>                     pidOfChain;
         std::vector<Mcmc*>                      chains;
         std::vector<double>                     chainValues;
         std::vector<double>                     chainHeats;
@@ -76,7 +76,8 @@ namespace RevBayesCore {
         size_t                                  currentGeneration;
         size_t                                  swapInterval;
         
-        size_t                                  activeChainIndex;                                   // index of coldest chain, i.e. which one samples the posterior
+        size_t                                  mcmcmcMasterPID;
+        size_t                                  coldChainIndex;                                     // index of coldest chain, i.e. which one samples the posterior
         double                                  delta;                                              // delta-T, temperature increment for computeBeta
         
         

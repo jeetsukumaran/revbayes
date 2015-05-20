@@ -45,7 +45,6 @@ MonteCarloAnalysis::MonteCarloAnalysis(MonteCarloSampler *m, size_t r) : Cloneab
         {
             runs[i]->setReplicateIndex( i+1 );
         }
-        runs[i]->setActive( true );
         runs[i]->setNumberOfProcesses( numProcessesPerReplicate );
     }
 #else
