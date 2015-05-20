@@ -60,8 +60,9 @@ namespace RevBayesCore {
         void                                                redraw(void);                                                               //!< Redraw the current value of the node (applies only to stochastic nodes)
         virtual void                                        reInitializeMe(void);                                                       //!< The DAG was re-initialized so maybe you want to reset some stuff (delegate to distribution)
         virtual void                                        setClamped(bool tf);                                                        //!< Set directly the flag whether this node is clamped.
-        virtual void                                        setValue(valueType *val, bool touch=true);                                  //!< Set the value of this node
         void                                                setIgnoreRedraw(bool tf=true);
+        virtual void                                        setNumberOfProcesses(size_t i, size_t offset=0);                            //!< Set the number of processes for this DAG node.
+        virtual void                                        setValue(valueType *val, bool touch=true);                                  //!< Set the value of this node
         void                                                unclamp(void);                                                              //!< Unclamp the variable
         
         // Parent DAG nodes management functions
@@ -499,6 +500,26 @@ void RevBayesCore::StochasticNode<valueType>::setClamped(bool tf)
 }
 
 
+template <class valueType>
+void RevBayesCore::StochasticNode<valueType>::setIgnoreRedraw( bool tf )
+{
+    ignoreRedraw = tf;
+}
+
+
+/**
+ * Set the number of processes available to this specific DAG node object.
+ * If there is more than one process available, then we can use these
+ * to compute the likelihood in parallel. Yeah!
+ */
+template <class valueType>
+void RevBayesCore::StochasticNode<valueType>::setNumberOfProcesses(size_t n, size_t offset)
+{
+    
+    distribution->setNumberOfProcesses( n, offset );
+}
+
+
 
 /**
  * Set the value.
@@ -515,13 +536,6 @@ void RevBayesCore::StochasticNode<valueType>::setValue(valueType *val, bool forc
         this->touch();
     }
     
-}
-
-
-template <class valueType>
-void RevBayesCore::StochasticNode<valueType>::setIgnoreRedraw( bool tf )
-{
-    ignoreRedraw = tf;
 }
 
 

@@ -59,7 +59,7 @@ namespace RevBayesCore {
         // public methods
         size_t                                  getCurrentGeneration(void) const;                   //!< Get the current generations number
         virtual void                            setActive(bool tf);                                 //!< Set if the the sampler is active or inactive
-        virtual void                            setNumberOfProcesses(size_t i, size_t offset=0);                     //!< Set the number of processes for this replication.
+        virtual void                            setNumberOfProcesses(size_t i, size_t offset=0);    //!< Set the number of processes for this replication.
         //        void                                    initializeMonitors(void);                         //!< Assign model and mcmc ptrs to monitors
 //        void                                    redrawChainState(void);
         

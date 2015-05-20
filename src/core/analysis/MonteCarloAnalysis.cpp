@@ -44,6 +44,7 @@ MonteCarloAnalysis::MonteCarloAnalysis(MonteCarloSampler *m, size_t r) : Cloneab
     
     
 #ifdef RB_MPI
+    // @TODO: Better rounding is needed!!!
     size_t numProcessesPerReplicate = numProcesses / replicates;
     for (size_t i = 0; i < replicates; ++i)
     {

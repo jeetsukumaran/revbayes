@@ -70,12 +70,12 @@ namespace RevBayesCore {
     public:
         // Note, we need the size of the alignment in the constructor to correctly simulate an initial state
         AbstractPhyloCTMCSiteHomogeneous(const TypedDagNode<treeType> *t, size_t nChars, size_t nMix, bool c, size_t nSites, bool amb );
-        AbstractPhyloCTMCSiteHomogeneous(const AbstractPhyloCTMCSiteHomogeneous &n);                                                                                          //!< Copy constructor
-        virtual                                                            ~AbstractPhyloCTMCSiteHomogeneous(void);                                                              //!< Virtual destructor
+        AbstractPhyloCTMCSiteHomogeneous(const AbstractPhyloCTMCSiteHomogeneous &n);                                                                                            //!< Copy constructor
+        virtual                                                            ~AbstractPhyloCTMCSiteHomogeneous(void);                                                             //!< Virtual destructor
         
         // public member functions
         // pure virtual
-        virtual AbstractPhyloCTMCSiteHomogeneous*                           clone(void) const = 0;                                                                      //!< Create an independent clone
+        virtual AbstractPhyloCTMCSiteHomogeneous*                           clone(void) const = 0;                                                                              //!< Create an independent clone
     
         // non-virtual
         double                                                              computeLnProbability(void);
@@ -83,12 +83,13 @@ namespace RevBayesCore {
         virtual void                                                        drawJointConditionalAncestralStates(std::vector<std::vector<charType> >& startStates, std::vector<std::vector<charType> >& endStates);
         virtual void                                                        recursivelyDrawJointConditionalAncestralStates(const TopologyNode &node, std::vector<std::vector<charType> >& startStates, std::vector<std::vector<charType> >& endStates, const std::vector<size_t>& sampledSiteRates);
         virtual void                                                        tipDrawJointConditionalAncestralStates(const TopologyNode &node, std::vector<std::vector<charType> >& startStates, std::vector<std::vector<charType> >& endStates, const std::vector<size_t>& sampledSiteRates);
-        void                                                                fireTreeChangeEvent(const TopologyNode &n);                                                 //!< The tree has changed and we want to know which part.
+        void                                                                fireTreeChangeEvent(const TopologyNode &n);                                                         //!< The tree has changed and we want to know which part.
         void																updateMarginalNodeLikelihoods(void);
-        void                                                                setValue(AbstractDiscreteCharacterData *v, bool f=false);                                   //!< Set the current value, e.g. attach an observation (clamp)
+        void                                                                setValue(AbstractDiscreteCharacterData *v, bool f=false);                                           //!< Set the current value, e.g. attach an observation (clamp)
         void                                                                redrawValue(void);
         void                                                                reInitialized(void);
-        
+        virtual void                                                        setNumberOfProcesses(size_t i, size_t offset=0);                                                    //!< Set the number of processes for this distribution.
+
         void                                                                setClockRate(const TypedDagNode< double > *r);
         void                                                                setClockRate(const TypedDagNode< RbVector< double > > *r);
         void                                                                setPInv(const TypedDagNode< double > *);
@@ -1745,6 +1746,30 @@ void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setCloc
     
 }
 
+
+
+/**
+ * Set the number of processes available to this specific DAG node object.
+ * If there is more than one process available, then we can use these
+ * to compute the likelihood in parallel. Yeah!
+ */
+template <class charType, class treeType>
+void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setNumberOfProcesses(size_t n, size_t offset)
+{
+    
+    // set the MPI variables
+    activePID     = offset;
+    numProcesses  = n;
+    processActive = pid == activePID;
+    
+    // compute which block of the data this process needs to compute
+    pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
+    pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
+    pattern_block_size  = pattern_block_end - pattern_block_start;
+    
+    // we need to recompress the data
+    this->compress();
+}
 
 
 template<class charType, class treeType>
