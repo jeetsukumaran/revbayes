@@ -1140,7 +1140,6 @@ void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::tipDraw
     
     // get working variables
     size_t nodeIndex = node.getIndex();
-    const std::vector<unsigned long> &char_node = this->charMatrix[nodeIndex];
 
     // get transition probabilities
     this->updateTransitionProbabilities( nodeIndex, node.getBranchLength() );
