@@ -54,7 +54,6 @@ namespace RevBayesCore {
         void                                                setChainPosteriorHeat(double v);                                                        //!< Set the heating temparature of the posterior of the chain
         void                                                setChainIndex(size_t idx);                                                              //!< Set the index of the chain
         void                                                setLikelihoodHeat(double v);                                                            //!< Set the heating temparature of the likelihood of the chain
-        void                                                setNumberOfProcesses(size_t i, size_t offset=0);                                        //!< Set the number of processes for this MCMC simulation.
         void                                                setReplicateIndex(size_t idx);                                                          //!< Set the index of this replicate.
         void                                                setStoneIndex(size_t idx);                                                              //!< Set the index of this replicate.
         void                                                setScheduleType(const std::string &s);                                                  //!< Set the type of the move schedule
@@ -68,7 +67,8 @@ namespace RevBayesCore {
                                                                                       std::vector<DagNode*>&      orderedStochasticNodes,
                                                                                       std::set<const DagNode*>&   visitedNodes);
         void                                                replaceDag(const RbVector<Move> &mvs, const RbVector<Monitor> &mons);
-
+        void                                                setNumberOfProcessesSpecialized(size_t i, size_t offset=0);                                        //!< Set the number of processes for this MCMC simulation.
+        
         
         bool                                                chainActive;
         double                                              chainLikelihoodHeat;

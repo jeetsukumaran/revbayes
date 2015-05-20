@@ -14,21 +14,14 @@ using namespace RevBayesCore;
  *
  * \param[in]    m    The monte carlo sampler.
  */
-MonteCarloAnalysis::MonteCarloAnalysis(MonteCarloSampler *m, size_t r) : Cloneable(),
-    activePID( 0 ),
-    numProcesses( 1 ),
-    pid( 0 ),
-    processActive( true ),
+MonteCarloAnalysis::MonteCarloAnalysis(MonteCarloSampler *m, size_t r) : Cloneable(), Parallelizable(),
     replicates( r ),
     runs()
 {
 
 #ifdef RB_MPI
     numProcesses = MPI::COMM_WORLD.Get_size();
-    pid = MPI::COMM_WORLD.Get_rank();
 #endif
-    
-    processActive = (pid == activePID);
     
     // add a clone of the original sampler to our vector of runs
     runs.push_back( m );
@@ -69,11 +62,7 @@ MonteCarloAnalysis::MonteCarloAnalysis(MonteCarloSampler *m, size_t r) : Cloneab
 }
 
 
-MonteCarloAnalysis::MonteCarloAnalysis(const MonteCarloAnalysis &a) : Cloneable(),
-    activePID( a.activePID ),
-    numProcesses( a.numProcesses ),
-    pid( a.pid ),
-    processActive( a.processActive ),
+MonteCarloAnalysis::MonteCarloAnalysis(const MonteCarloAnalysis &a) : Cloneable(), Parallelizable(),
     replicates( a.replicates )
 {
     
@@ -113,6 +102,8 @@ MonteCarloAnalysis& MonteCarloAnalysis::operator=(const MonteCarloAnalysis &a)
     
     if ( this != &a )
     {
+        // delegate call to base class
+        Parallelizable::operator=( a );
         
         // free the runs
         for (size_t i = 0; i < replicates; ++i)
@@ -121,10 +112,6 @@ MonteCarloAnalysis& MonteCarloAnalysis::operator=(const MonteCarloAnalysis &a)
             delete sampler;
         }
         
-        activePID       = a.activePID;
-        numProcesses    = a.numProcesses;
-        pid             = a.pid;
-        processActive   = a.processActive;
         replicates      = a.replicates;
         
         // create replicate Monte Carlo samplers

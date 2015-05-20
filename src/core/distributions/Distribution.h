@@ -2,6 +2,7 @@
 #define Distribution_H
 
 #include "Cloneable.h"
+#include "Parallelizable.h"
 
 #include <iostream>
 #include <set>
@@ -31,7 +32,7 @@ namespace RevBayesCore {
      * Each derived distribution is responsible for managing its parameters, swapping them and returning
      * a set of pointers to them.
      */
-    class Distribution : public Cloneable {
+    class Distribution : public Cloneable, public Parallelizable {
         
     public:
         // destructor
@@ -44,7 +45,6 @@ namespace RevBayesCore {
         void                                    keep(DagNode* affecter);
         virtual void                            reInitialized( void );                                                  //!< The model was re-initialized
         void                                    restore(DagNode *restorer);
-        virtual void                            setNumberOfProcesses(size_t i, size_t offset=0);                        //!< Set the number of processes for this distribution.
         void                                    swapParameter(const DagNode *oldP, const DagNode *newP);                //!< Exchange the parameter
         void                                    touch(DagNode *toucher, bool touchAll);
         

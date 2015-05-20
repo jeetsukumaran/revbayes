@@ -21,6 +21,8 @@
 #ifndef DagNode_H
 #define DagNode_H
 
+#include "Parallelizable.h"
+
 #include <map>
 #include <set>
 #include <string>
@@ -32,7 +34,7 @@ namespace RevBayesCore {
     class Monitor;
     class Move;
 
-    class DagNode {
+    class DagNode : public Parallelizable {
     
     public:
         
@@ -95,7 +97,6 @@ namespace RevBayesCore {
         void                                                        setElementVariable(bool tf);                                                                //!< Set if this variable is hidden from printing.
         void                                                        setHidden(bool tf);                                                                         //!< Set if this variable is hidden from printing.
         virtual void                                                setName(const std::string &n);                                                              //!< Set the name of this variable for identification purposes.
-        virtual void                                                setNumberOfProcesses(size_t i, size_t offset=0);                                            //!< Set the number of processes for this DAG node.
         void                                                        setParentNamePrefix(const std::string &p);
         virtual void                                                setPriorOnly(bool tf);                                                                      //!< Set whether we want to have the probability of the prior only.
         virtual void                                                swapParent(const DagNode *oldP, const DagNode *newP);                                       //!< Exchange the parent node which includes setting myself as a child of the new parent and removing myself from my old parents children list

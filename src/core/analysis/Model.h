@@ -6,13 +6,14 @@
 #include <vector>
 
 #include "Cloneable.h"
+#include "Parallelizable.h"
 
 namespace RevBayesCore {
 
     class DagNode;
     
     /**
-     * \brief The Model class holds its independent copy of the model graph (DAG nodes) contained in the model
+     * The Model class holds its independent copy of the model graph (DAG nodes) contained in the model
      * and provides methods for convenient access.
      *
      * A Model object holds the model graph which is an independent copy
@@ -27,7 +28,7 @@ namespace RevBayesCore {
      * \since Version 1.0, 2012-06-21
      *
      */
-    class Model : public Cloneable {
+    class Model : public Cloneable, public Parallelizable {
         
         public:
                                                                     Model(const DagNode* source);                                   //!< Constructor from a single DAG node from which the model graph is extracted.
@@ -47,7 +48,9 @@ namespace RevBayesCore {
         std::vector<DagNode*>&                                      getDagNodes(void);                                              //!< Non-constant getter function of the set of DAG nodes contained in the model graph.
         const std::vector<DagNode*>&                                getDagNodes(void) const;                                        //!< Constant getter function of the set of DAG nodes contained in the model graph.
         const std::map<const DagNode*, DagNode*>&                   getNodesMap(void) const;                                        //!< Constant getter function of the map between the pointer of the original DAG nodes to the pointers of the copied DAG nodes.  
-        void                                                        setNumberOfProcesses(size_t i, size_t offset=0);                //!< Set the number of processes for this model.
+        
+    protected:
+        void                                                        setNumberOfProcessesSpecialized(size_t i, size_t offset=0);     //!< Set the number of processes for this model.
 
     private:
         

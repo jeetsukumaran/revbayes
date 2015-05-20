@@ -38,20 +38,9 @@ using namespace RevBayesCore;
  * \param[in]    mons The vector of monitors.
  */
 MonteCarloSampler::MonteCarloSampler(void) :
-    activePID(0),
     generation(0),
-    numProcesses(1),
-    pid(0),
-    processActive( true ),
     replicateIndex(0)
 {
-    
-#ifdef RB_MPI
-    //    numProcesses = MPI::COMM_WORLD.Get_size();
-    pid = MPI::COMM_WORLD.Get_rank();
-#endif
-    
-    processActive = (pid == activePID);
     
 }
 
@@ -80,24 +69,6 @@ size_t MonteCarloSampler::getCurrentGeneration( void ) const
 size_t MonteCarloSampler::getReplicateIndex( void ) const
 {
     return replicateIndex;
-}
-
-void MonteCarloSampler::setActive(bool tf)
-{
-#ifdef DEBUG_MPI_MCA
-    std::cout << pid << " MonteCarloSampler::setActive \n";
-#endif
-    processActive = tf;
-    if ( processActive )
-    {
-        activePID = 0; //pid;
-    }
-    
-}
-
-void MonteCarloSampler::setNumberOfProcesses(size_t n, size_t offset)
-{
-    numProcesses = n;
 }
 
 

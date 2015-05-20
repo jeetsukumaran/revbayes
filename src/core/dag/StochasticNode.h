@@ -61,7 +61,6 @@ namespace RevBayesCore {
         virtual void                                        reInitializeMe(void);                                                       //!< The DAG was re-initialized so maybe you want to reset some stuff (delegate to distribution)
         virtual void                                        setClamped(bool tf);                                                        //!< Set directly the flag whether this node is clamped.
         void                                                setIgnoreRedraw(bool tf=true);
-        virtual void                                        setNumberOfProcesses(size_t i, size_t offset=0);                            //!< Set the number of processes for this DAG node.
         virtual void                                        setValue(valueType *val, bool touch=true);                                  //!< Set the value of this node
         void                                                unclamp(void);                                                              //!< Unclamp the variable
         
@@ -74,6 +73,7 @@ namespace RevBayesCore {
         virtual void                                        getAffected(std::set<DagNode *>& affected, DagNode* affecter);              //!< Mark and get affected nodes
         virtual void                                        keepMe(DagNode* affecter);                                                  //!< Keep value of this and affected nodes
         virtual void                                        restoreMe(DagNode *restorer);                                               //!< Restore value of this nodes
+        virtual void                                        setNumberOfProcessesSpecialized(size_t i, size_t offset=0);                            //!< Set the number of processes for this DAG node.
         virtual void                                        touchMe(DagNode *toucher, bool touchAll);                                                  //!< Tell affected nodes value is reset
         
         // protected members
@@ -513,7 +513,7 @@ void RevBayesCore::StochasticNode<valueType>::setIgnoreRedraw( bool tf )
  * to compute the likelihood in parallel. Yeah!
  */
 template <class valueType>
-void RevBayesCore::StochasticNode<valueType>::setNumberOfProcesses(size_t n, size_t offset)
+void RevBayesCore::StochasticNode<valueType>::setNumberOfProcessesSpecialized(size_t n, size_t offset)
 {
     
     distribution->setNumberOfProcesses( n, offset );

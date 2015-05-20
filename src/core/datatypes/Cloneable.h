@@ -1,16 +1,3 @@
-/**
- * @file Cloneable.h
- *
- *
- * @brief Declaration of template cloneable. The only method this interface defines
- * is T* clone(void) const. The clone function is required in e.g. DAG nodes if the
- * type is abstract (e.g. RateMatrix, Function, ...)
- *
- * (c) Copyright 2009-
- * @author The RevBayes Development Core Team
- * @license GPL version 3
- */
-
 #ifndef Cloneable_H
 #define Cloneable_H
 
@@ -18,6 +5,21 @@
 
 namespace RevBayesCore {
     
+    
+    /**
+     * Interace for cloneable classes.
+     *
+     * The cloneable interface provides a mechanism for safe inheritance and copying (cloning)
+     * objects without knowing its actual derived typed.
+     *
+     * The only method this interface defines
+     * is T* clone(void) const. The clone function is required in e.g. DAG nodes if the
+     * type is abstract (e.g. RateMatrix, Function, ...)
+     *
+     * @copyright Copyright 2009-
+     * @author The RevBayes Development Core Team (Sebastian Hoehna)
+     * @since 2015-03-01, version 1.0
+     */
     class Cloneable {
         
     public:

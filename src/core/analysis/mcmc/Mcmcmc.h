@@ -31,6 +31,8 @@ namespace RevBayesCore {
         Mcmcmc(const Mcmcmc &m);
         virtual                                ~Mcmcmc(void);                                       //!< Virtual destructor
         
+        Mcmcmc&                                 operator=(const Mcmcmc &m);                         //!< Assignment operator
+        
         // public methods
         Mcmcmc*                                 clone(void) const;
         double                                  getModelLnProbability(void);
@@ -41,14 +43,19 @@ namespace RevBayesCore {
         void                                    printOperatorSummary(void) const;
         void                                    reset(void);                                        //!< Reset the sampler for a new run.
         void                                    setLikelihoodHeat(double h);                        //!< Set the heat of the likelihood function.
-        void                                    setNumberOfProcesses(size_t i, size_t offset=0);                     //!< Set the number of processes for this replication.
         void                                    setReplicateIndex(size_t i);                        //!< Set the index for this replication.
         void                                    setStoneIndex(size_t i);                            //!< Set the index for this replication.
         void                                    startMonitors(void);                                //!< Start the monitors
         void                                    startMonitors(size_t numCycles);                    //!< Start the monitors
         void                                    tune(void);                                         //!< Tune the sampler and its moves.
         
+    protected:
+
+        virtual void                            setNumberOfProcessesSpecialized(size_t i, size_t offset=0);    //!< Set the number of processes for this replication.
+        
+
     private:
+
         void                                    initialize(void);
         void                                    swapChains(void);
         void                                    swapNeighborChains(void);
@@ -60,8 +67,8 @@ namespace RevBayesCore {
         
         size_t                                  numChains;
         std::vector<size_t>                     heatRanks;
-        std::vector<std::vector<size_t> >       chainsPerProcess;
-        std::vector<size_t>                     processPerChain;
+//        std::vector<std::vector<size_t> >       chainsPerProcess;
+//        std::vector<size_t>                     processPerChain;
         std::vector<Mcmc*>                      chains;
         std::vector<double>                     chainValues;
         std::vector<double>                     chainHeats;
