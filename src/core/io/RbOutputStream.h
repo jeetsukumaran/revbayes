@@ -4,6 +4,10 @@
 #include <iostream>
 #include <ostream>
 
+#ifdef AP_MPI
+#include <mpi.h>
+#endif
+
 namespace RevBayesCore {
     
     
@@ -25,7 +29,20 @@ namespace RevBayesCore {
         RbOutputStream();
 
         template<class T>
-        RbOutputStream& operator<<(const T& x);
+        RbOutputStream& operator<<(const T& x)
+        {
+            size_t pid = 0;
+#ifdef AP_MPI
+            pid = MPI::COMM_WORLD.Get_rank();
+#endif
+            if ( pid == 0 )
+            {
+                std::cout << x;
+            }
+            
+            return *this;
+        }
+        
     
     };
     
