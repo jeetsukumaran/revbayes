@@ -68,10 +68,7 @@ RevBayesCore::RbOutputStream& UserInterface::getOutputStream( void )
 void UserInterface::output(std::string msg)
 {
 
-    if ( processID == 0 )
-    {
-        outStream << StringUtilities::formatStringForScreen( msg, RevBayesCore::RbUtils::PAD, RevBayesCore::RbUtils::PAD, RbSettings::userSettings().getLineWidth() );
-    }
+    outStream << StringUtilities::formatStringForScreen( msg, RevBayesCore::RbUtils::PAD, RevBayesCore::RbUtils::PAD, RbSettings::userSettings().getLineWidth() );
     
 }
 
@@ -80,17 +77,13 @@ void UserInterface::output(std::string msg)
 void UserInterface::output(std::string msg, const bool hasPadding)
 {
 
-    if ( processID == 0 )
+    if (hasPadding == true)
     {
-        if (hasPadding == true)
-        {
-            output(msg);
-        }
-        else
-        {
-            outStream << msg << "\n";
-        }
-        
+        output(msg);
+    }
+    else
+    {
+        outStream << msg << "\n";
     }
 }
 
