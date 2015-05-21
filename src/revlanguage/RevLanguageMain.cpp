@@ -63,7 +63,7 @@ void RevLanguageMain::startRevLanguageEnvironment(std::vector<std::string> sourc
     for (unsigned int i =0 ; i < sourceFiles.size(); i++)
     {
         line = "source(\"" + sourceFiles[i] + "\")";
-        std::cout << "> " << line << std::endl;
+        RevLanguage::UserInterface::userInterface().getOutputStream() << "> " << line << std::endl;
 
         // Process the command line
         if (result == 1)

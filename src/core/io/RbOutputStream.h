@@ -43,6 +43,22 @@ namespace RevBayesCore {
             return *this;
         }
         
+        RbOutputStream& operator<<( std::ostream&(*f)(std::ostream&) )
+        {
+            size_t pid = 0;
+#ifdef AP_MPI
+            pid = MPI::COMM_WORLD.Get_rank();
+#endif
+            if ( pid == 0 )
+            {
+                std::cout << f;
+            }
+            
+            return *this;
+            
+            return *this;
+        }
+        
     
     };
     
