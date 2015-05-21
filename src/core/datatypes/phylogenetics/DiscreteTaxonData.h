@@ -308,6 +308,7 @@ charType& RevBayesCore::DiscreteTaxonData<charType>::getCharacter(size_t index)
     
     if (index >= sequence.size())
     {
+        std::cerr << "Wrong index " << index << " -- size:\t\t" << sequence.size() << std::endl;
         throw RbException("Index out of bounds for discrete taxon data.");
     }
     

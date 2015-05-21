@@ -88,7 +88,6 @@ namespace RevBayesCore {
         void                                                                setValue(AbstractDiscreteCharacterData *v, bool f=false);                                           //!< Set the current value, e.g. attach an observation (clamp)
         void                                                                redrawValue(void);
         void                                                                reInitialized(void);
-        virtual void                                                        setNumberOfProcesses(size_t i, size_t offset=0);                                                    //!< Set the number of processes for this distribution.
 
         void                                                                setClockRate(const TypedDagNode< double > *r);
         void                                                                setClockRate(const TypedDagNode< RbVector< double > > *r);
@@ -104,6 +103,7 @@ namespace RevBayesCore {
         void                                                                recursivelyFlagNodeDirty(const TopologyNode& n);
         void                                                                rescale(size_t nodeIndex);
         virtual void                                                        resizeLikelihoodVectors(void);
+        virtual void                                                        setNumberOfProcessesSpecialized(size_t i, size_t offset=0);                                                    //!< Set the number of processes for this distribution.
 
         virtual void                                                        updateTransitionProbabilities(size_t nodeIdx, double brlen);
         virtual const std::vector<double>&                                  getRootFrequencies(void) const;
@@ -192,10 +192,6 @@ namespace RevBayesCore {
         bool                                                                rateVariationAcrossSites;
 
         // MPI variables
-        size_t                                                              activePID;
-        size_t                                                              numProcesses;
-        size_t                                                              pid;
-        bool                                                                processActive;
         size_t                                                              pattern_block_start;
         size_t                                                              pattern_block_end;
         size_t                                                              pattern_block_size;
@@ -257,10 +253,6 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     usingAmbiguousCharacters( amb ),
     treatUnknownAsGap( true ),
     treatAmbiguousAsGaps( false ),
-    activePID(0),
-    numProcesses(1),
-    pid(0),
-    processActive( true ),
     pattern_block_start( 0 ),
     pattern_block_end( numPatterns ),
     pattern_block_size( numPatterns )
@@ -275,12 +267,6 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     siteRates                   = NULL;
     siteRatesProbs              = NULL;
     pInv                        = new ConstantNode<double>("pInv", new double(0.0) );
-    
-    // Initialize MPI variables
-#ifdef RB_MPI
-    //    numProcesses = MPI::COMM_WORLD.Get_size();
-    pid = MPI::COMM_WORLD.Get_rank();
-#endif
     
     // compute which block of the data this process needs to compute
     pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
@@ -356,10 +342,6 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     usingAmbiguousCharacters( n.usingAmbiguousCharacters ),
     treatUnknownAsGap( n.treatUnknownAsGap ),
     treatAmbiguousAsGaps( n.treatAmbiguousAsGaps ),
-    activePID( n.activePID ),
-    numProcesses( n.numProcesses ),
-    pid( n.pid ),
-    processActive( n.processActive ),
     pattern_block_start( n.pattern_block_start ),
     pattern_block_end( n.pattern_block_end ),
     pattern_block_size( n.pattern_block_size )
@@ -405,7 +387,8 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
  * when we die. All other parameters are handled by others.
  */
 template<class charType, class treeType>
-RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::~AbstractPhyloCTMCSiteHomogeneous( void ) {
+RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::~AbstractPhyloCTMCSiteHomogeneous( void )
+{
     // We don't delete the params, because they might be used somewhere else too. The model needs to do that!
     
     // remove myself from the tree listeners
@@ -1754,13 +1737,8 @@ void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setCloc
  * to compute the likelihood in parallel. Yeah!
  */
 template <class charType, class treeType>
-void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setNumberOfProcesses(size_t n, size_t offset)
+void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setNumberOfProcessesSpecialized(size_t n, size_t offset)
 {
-    
-    // set the MPI variables
-    activePID     = offset;
-    numProcesses  = n;
-    processActive = pid == activePID;
     
     // compute which block of the data this process needs to compute
     pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
