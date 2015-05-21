@@ -7,6 +7,7 @@
 #include "RevObject.h"
 #include "RlUtils.h"
 #include "RlString.h"
+#include "RlUserInterface.h"
 #include "TypeSpec.h"
 
 #include <sstream>
@@ -115,7 +116,7 @@ RevPtr<RevVariable> RevObject::executeMethod(std::string const &name, const std:
         
         // just print the method names (including inherited methods)
         const MethodTable &m = getMethods();
-        m.printValue(std::cout, true);
+        m.printValue(UserInterface::userInterface().getOutputStream(), true);
         
         return NULL;
     }

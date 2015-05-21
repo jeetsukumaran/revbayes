@@ -1,22 +1,3 @@
-/**
- * @file
- * This file contains the implementation of UserInterface, which is
- * the base class for different user interfaces.
- *
- * @brief Declaration of UserInterface
- *
- * (c) Copyright 2009-
- * @date Last modified: $Date$
- * @author The RevBayes Development Core Team
- * @license GPL version 3
- * @extends Frame
- * @package parser
- * @version 1.0
- * @since version 1.0 2009-09-02
- *
- * $Id$
- */
-
 #include "RbSettings.h"
 #include "RbUtil.h"
 #include "StringUtilities.h"
@@ -29,16 +10,11 @@
 using namespace RevLanguage;
 
 
-UserInterface::UserInterface( void ) :
-    processID( 0 )
+UserInterface::UserInterface( void )
 {
-#if defined (RB_MPI)
-        processID = MPI::COMM_WORLD.Get_rank();
-#endif
 }
 
-UserInterface::UserInterface( const UserInterface &u ) :
-    processID( u.processID )
+UserInterface::UserInterface( const UserInterface &u )
 {
 }
 
@@ -47,7 +23,7 @@ bool UserInterface::ask(std::string msg)
 {
 
     std::string answer, dummy;
-    std::cout << RevBayesCore::RbUtils::PAD << (msg + "? (yes/no) ");     // not using RBOUT or output because we do not want a newline
+    output(msg + "? (yes/no) ");     // not using RBOUT or output because we do not want a newline
     std::cin >> answer;
     for (size_t i=0; i<answer.size(); i++)
     {
@@ -57,9 +33,9 @@ bool UserInterface::ask(std::string msg)
     while (answer!="y" && answer!="yes" && answer!="n" && answer!="no") 
     {
         std::getline(std::cin, dummy);
-        std::cout << std::endl;
-		RBOUT("Please answer yes or no.");
-        std::cout << RevBayesCore::RbUtils::PAD << (msg + "? (yes/no) "); // see above for choice of std::cout
+        outStream << "\n";
+		output("Please answer yes or no.");
+        output(msg + "? (yes/no) "); // see above for choice of std::cout
 
         std::cin >> answer;
         for (size_t i=0; i<answer.size(); i++)
@@ -82,12 +58,19 @@ bool UserInterface::ask(std::string msg)
 }
 
 
+RevBayesCore::RbOutputStream& UserInterface::getOutputStream( void )
+{
+    return outStream;
+}
+
+
 /** Print a message and a newline */
-void UserInterface::output(std::string msg) {
+void UserInterface::output(std::string msg)
+{
 
     if ( processID == 0 )
     {
-        std::cout << StringUtilities::formatStringForScreen( msg, RevBayesCore::RbUtils::PAD, RevBayesCore::RbUtils::PAD, RbSettings::userSettings().getLineWidth() );
+        outStream << StringUtilities::formatStringForScreen( msg, RevBayesCore::RbUtils::PAD, RevBayesCore::RbUtils::PAD, RbSettings::userSettings().getLineWidth() );
     }
     
 }
@@ -105,7 +88,7 @@ void UserInterface::output(std::string msg, const bool hasPadding)
         }
         else
         {
-            std::cout << msg << std::endl;
+            outStream << msg << "\n";
         }
         
     }
@@ -113,7 +96,8 @@ void UserInterface::output(std::string msg, const bool hasPadding)
 
 
 /** Convert to string and then call output to print message string */
-void UserInterface::output(std::ostringstream msg) {
+void UserInterface::output(std::ostringstream msg)
+{
 
     output( msg.str() );
 }
