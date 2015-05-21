@@ -195,6 +195,8 @@ namespace RevBayesCore {
         size_t                                                              pattern_block_start;
         size_t                                                              pattern_block_end;
         size_t                                                              pattern_block_size;
+        size_t                                                              likelihood_master_pid;
+        
     private:
         
         // private methods
@@ -255,7 +257,8 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     treatAmbiguousAsGaps( false ),
     pattern_block_start( 0 ),
     pattern_block_end( numPatterns ),
-    pattern_block_size( numPatterns )
+    pattern_block_size( numPatterns ),
+    likelihood_master_pid( 0 )
 {
     
     // initialize with default parameters
@@ -324,9 +327,9 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     numSiteRates( n.numSiteRates ),
     tau( n.tau ), 
     transitionProbMatrices( n.transitionProbMatrices ),
-    partialLikelihoods( new double[2*numNodes*numSiteRates*numSites*numChars] ),
+    partialLikelihoods( new double[2*numNodes*numSiteRates*n.pattern_block_size*numChars] ),
     activeLikelihood( n.activeLikelihood ),
-    marginalLikelihoods( new double[numNodes*numSiteRates*numSites*numChars] ),
+    marginalLikelihoods( new double[numNodes*numSiteRates*n.pattern_block_size*numChars] ),
     perNodeSiteLogScalingFactors( n.perNodeSiteLogScalingFactors ),
     useScaling( n.useScaling ),
     charMatrix( n.charMatrix ),
@@ -344,7 +347,8 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     treatAmbiguousAsGaps( n.treatAmbiguousAsGaps ),
     pattern_block_start( n.pattern_block_start ),
     pattern_block_end( n.pattern_block_end ),
-    pattern_block_size( n.pattern_block_size )
+    pattern_block_size( n.pattern_block_size ),
+    likelihood_master_pid( n.likelihood_master_pid )
 {
     
     // initialize with default parameters
@@ -2076,32 +2080,37 @@ double RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::sumRo
     
 #ifdef RB_MPI
     
-    if ( !processActive )
+    if ( likelihood_master_pid != pid )
     {
         // send from the workers the log-likelihood to the master
-        MPI::COMM_WORLD.Send(&sumPartialProbs, 1, MPI::DOUBLE, activePID, 0);
+        MPI::COMM_WORLD.Send(&sumPartialProbs, 1, MPI::DOUBLE, likelihood_master_pid, 0);
     }
-    
-    if ( processActive )
+    else
     {
-        for (size_t i=activePID+1; i<activePID+numProcesses; ++i)
+        for (size_t i=offsetPID; i<offsetPID+numProcesses; ++i)
         {
-            double tmp = 0;
-            MPI::COMM_WORLD.Recv(&tmp, 1, MPI::DOUBLE, (int)i, 0);
-            sumPartialProbs += tmp;
+            if ( i != pid )
+            {
+                double tmp = 0;
+                MPI::COMM_WORLD.Recv(&tmp, 1, MPI::DOUBLE, (int)i, 0);
+                sumPartialProbs += tmp;
+            }
         }
     }
     
-    if ( processActive )
+    if ( pid == likelihood_master_pid )
     {
-        for (size_t i=activePID+1; i<activePID+numProcesses; ++i)
+        for (size_t i=offsetPID; i<offsetPID+numProcesses; ++i)
         {
-            MPI::COMM_WORLD.Send(&sumPartialProbs, 1, MPI::DOUBLE, (int)i, 0);
+            if ( i != pid )
+            {
+                MPI::COMM_WORLD.Send(&sumPartialProbs, 1, MPI::DOUBLE, (int)i, 0);
+            }
         }
     }
     else
     {
-        MPI::COMM_WORLD.Recv(&sumPartialProbs, 1, MPI::DOUBLE, activePID, 0);
+        MPI::COMM_WORLD.Recv(&sumPartialProbs, 1, MPI::DOUBLE, likelihood_master_pid, 0);
     }
     
 #endif

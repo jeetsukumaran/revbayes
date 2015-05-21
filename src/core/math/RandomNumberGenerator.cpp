@@ -30,17 +30,9 @@ RandomNumberGenerator::RandomNumberGenerator(void) :
         rng(),
         zeroone(rng)
 {
-
-	unsigned int x  = (unsigned int)( time(0) );    
-    rng.seed( x );
+  
+    rng.seed( seed );
     zeroone = boost::uniform_01<boost::rand48>(rng);
-
-#ifdef RB_MPI
-    // cycle through pid random numbers
-    int pid = MPI::COMM_WORLD.Get_rank();
-    for (int i = 0; i < pid; i++)
-        zeroone();
-#endif
 
 }
 
@@ -49,13 +41,19 @@ RandomNumberGenerator::RandomNumberGenerator(void) :
 unsigned int RandomNumberGenerator::getSeed( void ) const
 {
     return seed;
+    
 }
 
 
 /** Set the seed of the random number generator */
-void RandomNumberGenerator::setSeed(unsigned int s) {
+void RandomNumberGenerator::setSeed(unsigned int s)
+{
 
     seed = s;
+    
+    rng.seed( seed );
+    zeroone = boost::uniform_01<boost::rand48>(rng);
+    
 }
 
 

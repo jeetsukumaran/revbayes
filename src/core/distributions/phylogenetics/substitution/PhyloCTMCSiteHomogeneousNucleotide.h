@@ -84,9 +84,6 @@ template<class charType, class treeType>
 void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::computeRootLikelihood( size_t root, size_t left, size_t right)
 {
     
-    // reset the likelihood
-    this->lnProb = 0.0;
-    
     // get the root frequencies
     const std::vector<double> &f                    = this->getRootFrequencies();
     
@@ -113,7 +110,7 @@ void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::compu
         const double*   p_site_mixture_left     = p_mixture_left;
         const double*   p_site_mixture_right    = p_mixture_right;
         // iterate over all sites
-        for (size_t site = 0; site < this->numPatterns; ++site)
+        for (size_t site = 0; site < this->pattern_block_size; ++site)
         {
             
             p_site_mixture[0] = p_site_mixture_left[0] * p_site_mixture_right[0] * f0;
@@ -136,9 +133,6 @@ void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::compu
 template<class charType, class treeType>
 void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::computeRootLikelihood( size_t root, size_t left, size_t right, size_t middle)
 {
-    
-    // reset the likelihood
-    this->lnProb = 0.0;
     
     // get the root frequencies
     const std::vector<double> &f                    = this->getRootFrequencies();
@@ -169,7 +163,7 @@ void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::compu
         const double*   p_site_mixture_right    = p_mixture_right;
         const double*   p_site_mixture_middle   = p_mixture_middle;
         // iterate over all sites
-        for (size_t site = 0; site < this->numPatterns; ++site)
+        for (size_t site = 0; site < this->pattern_block_size; ++site)
         {
             
             p_site_mixture[0] = p_site_mixture_left[0] * p_site_mixture_right[0] * p_site_mixture_middle[0] * f0;
@@ -271,7 +265,7 @@ void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::compu
 #       endif
 
         // compute the per site probabilities
-        for (size_t site = 0; site < this->numPatterns ; ++site)
+        for (size_t site = 0; site < this->pattern_block_size ; ++site)
         {
             
 #           if defined ( SSE_ENABLED )
@@ -444,7 +438,7 @@ void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::compu
 #       endif
         
         // compute the per site probabilities
-        for (size_t site = 0; site < this->numPatterns ; ++site)
+        for (size_t site = 0; site < this->pattern_block_size ; ++site)
         {
             
 #           if defined ( SSE_ENABLED )
@@ -579,7 +573,7 @@ void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::compu
         double*     p_site_mixture      = p_mixture;
         
         // iterate over all sites
-        for (size_t site = 0; site < this->numPatterns; ++site)
+        for (size_t site = 0; site < this->pattern_block_size; ++site)
         {
             
             // is this site a gap?
