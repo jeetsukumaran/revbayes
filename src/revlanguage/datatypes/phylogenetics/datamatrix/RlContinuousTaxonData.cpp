@@ -48,7 +48,7 @@ RevPtr<RevLanguage::RevVariable> ContinuousTaxonData::executeMethod(std::string 
     
         if (this->dagNode->getValue().size() < (size_t)(index.getValue()) )
         {
-            throw RbException("Index out of bounds in []");
+            throw RbException("Index out of bounds in [] of continuous taxon data.");
         }
         
         RevObject* element = new Real( this->dagNode->getValue().getCharacter( size_t(index.getValue()) - 1) );

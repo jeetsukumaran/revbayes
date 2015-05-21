@@ -85,7 +85,7 @@ RevLanguage::RevPtr<RevLanguage::RevVariable> RevLanguage::DiscreteTaxonData<rlT
             
         if (this->dagNode->getValue().size() < (size_t)(index.getValue()) )
         {
-            throw RbException("Index out of bounds in []");
+            throw RbException("Index out of bounds in [] discrete taxon data.");
         }
             
         RevObject* element = new rlType( this->dagNode->getValue().getCharacter( size_t(index.getValue()) - 1) );

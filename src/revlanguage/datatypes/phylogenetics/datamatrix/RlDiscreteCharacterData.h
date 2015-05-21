@@ -118,7 +118,7 @@ RevLanguage::RevPtr<RevLanguage::RevVariable> RevLanguage::DiscreteCharacterData
             
         if (this->dagNode->getValue().getNumberOfTaxa() < (size_t)(index.getValue()) )
         {
-            throw RbException("Index out of bounds in []");
+            throw RbException("Index out of bounds in [] discrete character data.");
         }
             
         const RevBayesCore::DiscreteTaxonData<typename rlType::valueType>& element = static_cast< RevBayesCore::DiscreteCharacterData<typename rlType::valueType>& >( this->dagNode->getValue() ).getTaxonData(size_t(index.getValue()) - 1);

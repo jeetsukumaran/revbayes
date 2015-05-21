@@ -41,7 +41,9 @@ double& ContinuousTaxonData::operator[](size_t i)
 {
     
     if (i >= sequence.size())
-        throw RbException("Index out of bounds");
+    {
+        throw RbException("Index out of bounds for continuous taxon data.");
+    }
     
     return sequence[i];
 }
@@ -58,7 +60,9 @@ const double& ContinuousTaxonData::operator[](size_t i) const
 {
     
     if (i >= sequence.size())
-        throw RbException("Index out of bounds");
+    {
+        throw RbException("Index out of bounds for continuous taxon data.");
+    }
     
     return sequence[i];
 }
@@ -146,7 +150,9 @@ double& ContinuousTaxonData::getCharacter(size_t index)
 {
     
     if (index >= sequence.size())
-        throw RbException("Index out of bounds");
+    {
+        throw RbException("Index out of bounds for continuous taxon data.");
+    }
     
     return sequence[index];
 }
@@ -163,7 +169,9 @@ const double& ContinuousTaxonData::getCharacter(size_t index) const
 {
     
     if (index >= sequence.size())
-        throw RbException("Index out of bounds");
+    {
+        throw RbException("Index out of bounds for continuous taxon data.");
+    }
     
     return sequence[index];
 }
@@ -217,9 +225,10 @@ bool ContinuousTaxonData::isCharacterResolved(size_t idx) const
 {
 
     if (idx >= isResolved.size())
-        {
-        throw RbException("Index out of bounds");
-        }
+    {
+        throw RbException("Index out of bounds for continuous taxon data.");
+    }
+    
     return isResolved[idx];
 }
 

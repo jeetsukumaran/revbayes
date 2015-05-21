@@ -162,7 +162,7 @@ RevPtr<RevVariable> ContinuousCharacterData::executeMethod(std::string const &na
         
             if (this->dagNode->getValue().getNumberOfTaxa() < (size_t)(index.getValue()) )
             {
-                throw RbException("Index out of bounds in []");
+                throw RbException("Index out of bounds in [] of continuous character data.");
             }
         
             const RevBayesCore::ContinuousTaxonData& element = static_cast< RevBayesCore::ContinuousCharacterData& >( this->dagNode->getValue() ).getTaxonData(size_t(index.getValue()) - 1);

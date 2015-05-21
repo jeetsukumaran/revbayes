@@ -83,11 +83,12 @@ RevBayesCore::DiscreteTaxonData<charType>::DiscreteTaxonData(const std::string &
  * \return            A non-const reference to the character
  */
 template<class charType>
-charType& RevBayesCore::DiscreteTaxonData<charType>::operator[](size_t i) {
+charType& RevBayesCore::DiscreteTaxonData<charType>::operator[](size_t i)
+{
     
     if (i >= sequence.size())
     {
-        throw RbException("Index out of bounds");
+        throw RbException("Index out of bounds for discrete taxon data.");
     }
     
     return sequence[i];
@@ -107,7 +108,7 @@ const charType& RevBayesCore::DiscreteTaxonData<charType>::operator[](size_t i) 
     
     if (i >= sequence.size())
     {
-        throw RbException("Index out of bounds");
+        throw RbException("Index out of bounds for discrete taxon data.");
     }
     
     return sequence[i];
@@ -307,7 +308,7 @@ charType& RevBayesCore::DiscreteTaxonData<charType>::getCharacter(size_t index)
     
     if (index >= sequence.size())
     {
-        throw RbException("Index out of bounds");
+        throw RbException("Index out of bounds for discrete taxon data.");
     }
     
     return sequence[index];
@@ -327,7 +328,7 @@ const charType& RevBayesCore::DiscreteTaxonData<charType>::getCharacter(size_t i
     
     if (index >= sequence.size())
     {
-        throw RbException("Index out of bounds");
+        throw RbException("Index out of bounds for discrete taxon data.");
     }
     
     return sequence[index];
@@ -387,12 +388,14 @@ const std::string& RevBayesCore::DiscreteTaxonData<charType>::getTaxonName(void)
  * \return            True (resolved) or false (unresolved).
  */
 template<class charType>
-bool RevBayesCore::DiscreteTaxonData<charType>::isCharacterResolved(size_t idx) const {
+bool RevBayesCore::DiscreteTaxonData<charType>::isCharacterResolved(size_t idx) const
+{
 
     if (idx >= isResolved.size())
-        {
-        throw RbException("Index out of bounds");
-        }
+    {
+        throw RbException("Index out of bounds for discrete taxon data.");
+    }
+    
     return isResolved[idx];
 }
 

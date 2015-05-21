@@ -797,6 +797,8 @@ void Mcmc::setLikelihoodHeat(double h)
 void Mcmc::setNumberOfProcessesSpecialized(size_t n, size_t offset)
 {
     
+    std::cerr << "Running MCMC with " << n << " processes to compute the likelihood." << std::endl;
+    
     // delegate the call to the model
     model.setNumberOfProcesses(n,offset);
 }
