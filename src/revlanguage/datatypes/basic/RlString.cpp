@@ -140,7 +140,8 @@ void RlString::parseValue(void)
         char c = *it++;
         if (c == '\\' && it != v.end())
         {
-            switch (*it++) {
+            switch (*it++)
+            {
                 case '\\': c = '\\'; break;
                 case 'n': c = '\n'; break;
                 case 't': c = '\t'; break;
@@ -157,6 +158,25 @@ void RlString::parseValue(void)
 }
 
 
+/**
+ * Print value for user. The DAG node pointer may be NULL, in which
+ * case we print "NA".
+ */
+void RlString::printValue(std::ostream& o) const
+{
+    
+    if ( dagNode == NULL )
+    {
+        o << "NA";
+    }
+    else
+    {
+        dagNode->printValue( o );
+    }
+    
+}
+
+
 
 /** Print value */
 void RlString::printValue(std::ostream& o, bool toScreen) const
@@ -165,22 +185,13 @@ void RlString::printValue(std::ostream& o, bool toScreen) const
     if ( toScreen == true )
     {
         o << "\"";
-        dagNode->printValue( o );
+        printValue( o );
         o << "\"";
     }
     else
     {
-        dagNode->printValue( o );
+        printValue( o );
     }
-}
-
-
-
-/** Print value */
-void RlString::printValue(std::ostream& o) const
-{
-    
-    dagNode->printValue( o );
     
 }
 

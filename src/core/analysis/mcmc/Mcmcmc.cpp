@@ -434,21 +434,6 @@ void Mcmcmc::setStoneIndex(size_t index)
 }
 
 
-
-void Mcmcmc::startMonitors( void )
-{
-    // Monitor
-    for (size_t i = 0; i < numChains; i++)
-    {
-        if (pidOfChain[i] != pid)
-        {
-            chains[i]->startMonitors();
-        }
-    }
-    
-}
-
-
 void Mcmcmc::startMonitors(size_t numCycles)
 {
     
@@ -466,6 +451,7 @@ void Mcmcmc::startMonitors(size_t numCycles)
             {
                 chains[i]->monitor(0);
             }
+            
         }
         
     }

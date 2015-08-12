@@ -45,7 +45,6 @@ namespace RevBayesCore {
         void                                    setLikelihoodHeat(double h);                        //!< Set the heat of the likelihood function.
         void                                    setReplicateIndex(size_t i);                        //!< Set the index for this replication.
         void                                    setStoneIndex(size_t i);                            //!< Set the index for this replication.
-        void                                    startMonitors(void);                                //!< Start the monitors
         void                                    startMonitors(size_t numCycles);                    //!< Start the monitors
         void                                    tune(void);                                         //!< Tune the sampler and its moves.
         

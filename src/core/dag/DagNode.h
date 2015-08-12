@@ -52,6 +52,7 @@ namespace RevBayesCore {
         virtual void                                                printStructureInfo(std::ostream &o, bool verbose=false) const = 0;                          //!< Print the structural information (e.g. name, value-type, distribution/function, children, parents, etc.)
         virtual void                                                printValue(std::ostream &o, int l=-1, bool left=true) const = 0;                            //!< Monitor/Print this variable
         virtual void                                                redraw(void) = 0;                                                                           //!< Redraw the current value of the node (applies only to stochastic nodes)
+        virtual void                                                setMcmcMode(bool tf) = 0;                                                                   //!< Set the modus of the DAG node to MCMC mode.
         
         // public member functions
         void                                                        addChild(DagNode *child) const;                                                             //!< Add a new child node
@@ -63,7 +64,7 @@ namespace RevBayesCore {
         size_t                                                      decrementReferenceCount(void) const;                                                        //!< Decrement the reference count for reference counting in smart pointers
         void                                                        getAffectedNodes(std::set<DagNode *>& affected);                                            //!< get affected nodes
         const std::set<DagNode*>&                                   getChildren(void) const;                                                                    //!< Get the set of children
-        std::string                                                 getDagNodeType(void) const;
+        DagNodeTypes                                                getDagNodeType(void) const;
         virtual Distribution&                                       getDistribution(void);
         virtual const Distribution&                                 getDistribution(void) const;
         DagNode*                                                    getFirstChild(void) const;                                                                  //!< Get the first child from a our set

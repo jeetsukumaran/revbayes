@@ -85,6 +85,7 @@ namespace RevBayesCore {
         virtual void                                                        tipDrawJointConditionalAncestralStates(const TopologyNode &node, std::vector<std::vector<charType> >& startStates, std::vector<std::vector<charType> >& endStates, const std::vector<size_t>& sampledSiteRates);
         void                                                                fireTreeChangeEvent(const TopologyNode &n);                                                         //!< The tree has changed and we want to know which part.
         void																updateMarginalNodeLikelihoods(void);
+        void                                                                setMcmcMode(bool tf);                                                                               //!< Change the likelihood computation to or from MCMC mode.
         void                                                                setValue(AbstractDiscreteCharacterData *v, bool f=false);                                           //!< Set the current value, e.g. attach an observation (clamp)
         void                                                                redrawValue(void);
         void                                                                reInitialized(void);
@@ -175,6 +176,9 @@ namespace RevBayesCore {
         bool                                                                treatUnknownAsGap;
         bool                                                                treatAmbiguousAsGaps;
         
+        bool                                                                useMarginalLikelihoods;
+        bool                                                                inMcmcMode;
+        
         // members
         const TypedDagNode< double >*                                       homogeneousClockRate;
         const TypedDagNode< RbVector< double > >*                           heterogeneousClockRates;
@@ -207,7 +211,7 @@ namespace RevBayesCore {
         void                                                                scale(size_t i, size_t l, size_t r, size_t m);
         virtual void                                                        simulate(const TopologyNode& node, std::vector< DiscreteTaxonData< charType > > &t, const std::vector<size_t> &perSiteRates);
         virtual double                                                      sumRootLikelihood( void );
-    
+        
     };
     
 }
@@ -237,9 +241,11 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     numSiteRates( nMix ),
     tau( t ), 
     transitionProbMatrices( std::vector<TransitionProbabilityMatrix>(numSiteRates, TransitionProbabilityMatrix(numChars) ) ),
-    partialLikelihoods( new double[2*numNodes*numSiteRates*numSites*numChars] ),
+//    partialLikelihoods( new double[2*numNodes*numSiteRates*numSites*numChars] ),
+    partialLikelihoods( NULL ),
     activeLikelihood( std::vector<size_t>(numNodes, 0) ),
-    marginalLikelihoods( new double[numNodes*numSiteRates*numSites*numChars] ),
+//    marginalLikelihoods( new double[numNodes*numSiteRates*numSites*numChars] ),
+    marginalLikelihoods( NULL ),
     perNodeSiteLogScalingFactors( std::vector<std::vector< std::vector<double> > >(2, std::vector<std::vector<double> >(numNodes*2, std::vector<double>(numSites, 0.0) ) ) ),
     useScaling( true ),
     charMatrix(),
@@ -255,6 +261,12 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     usingAmbiguousCharacters( amb ),
     treatUnknownAsGap( true ),
     treatAmbiguousAsGaps( false ),
+    useMarginalLikelihoods( false ),
+    inMcmcMode( false ),
+//    activePID(0),
+//    numProcesses(1),
+//    pid(0),
+//    processActive( true ),
     pattern_block_start( 0 ),
     pattern_block_end( numPatterns ),
     pattern_block_size( numPatterns ),
@@ -275,16 +287,6 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
     pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
     pattern_block_size  = pattern_block_end - pattern_block_start;
-    
-	// initialize liklihood vectors to 0.0
-	for (size_t i = 0; i < 2*numNodes*numSiteRates*numSites*numChars; i++)
-    {
-		partialLikelihoods[i] = 0.0;
-	}
-	for (size_t i = 0; i < numNodes*numSiteRates*numSites*numChars; i++)
-    {
-		marginalLikelihoods[i] = 0.0;
-	}
     
     // flags specifying which model variants we use
     branchHeterogeneousClockRates               = false;
@@ -327,9 +329,11 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     numSiteRates( n.numSiteRates ),
     tau( n.tau ), 
     transitionProbMatrices( n.transitionProbMatrices ),
-    partialLikelihoods( new double[2*numNodes*numSiteRates*n.pattern_block_size*numChars] ),
+//    partialLikelihoods( new double[2*numNodes*numSiteRates*numSites*numChars] ),
+    partialLikelihoods( NULL ),
     activeLikelihood( n.activeLikelihood ),
-    marginalLikelihoods( new double[numNodes*numSiteRates*n.pattern_block_size*numChars] ),
+//    marginalLikelihoods( new double[numNodes*numSiteRates*numSites*numChars] ),
+    marginalLikelihoods( NULL ),
     perNodeSiteLogScalingFactors( n.perNodeSiteLogScalingFactors ),
     useScaling( n.useScaling ),
     charMatrix( n.charMatrix ),
@@ -345,6 +349,12 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     usingAmbiguousCharacters( n.usingAmbiguousCharacters ),
     treatUnknownAsGap( n.treatUnknownAsGap ),
     treatAmbiguousAsGaps( n.treatAmbiguousAsGaps ),
+    useMarginalLikelihoods( n.useMarginalLikelihoods ),
+    inMcmcMode( n.inMcmcMode ),
+//    activePID( n.activePID ),
+//    numProcesses( n.numProcesses ),
+//    pid( n.pid ),
+//    processActive( n.processActive ),
     pattern_block_start( n.pattern_block_start ),
     pattern_block_end( n.pattern_block_end ),
     pattern_block_size( n.pattern_block_size ),
@@ -371,12 +381,18 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     tau->getValue().getTreeChangeEventHandler().addListener( this );
     tau->incrementReferenceCount();
     
-    // copy the partial likelihoods
-	memcpy(partialLikelihoods, n.partialLikelihoods, 2*numNodes*numSiteRates*pattern_block_size*numChars*sizeof(double));
-
-    // copy the marginal likelihoods
-    memcpy(marginalLikelihoods, n.marginalLikelihoods, numNodes*numSiteRates*pattern_block_size*numChars*sizeof(double));
-	
+    // copy the partial likelihoods if necessary
+    if ( inMcmcMode == true )
+    {
+        partialLikelihoods = new double[2*numNodes*numSiteRates*numSites*numChars];
+        memcpy(partialLikelihoods, n.partialLikelihoods, 2*numNodes*numSiteRates*pattern_block_size*numChars*sizeof(double));
+    }
+    // copy the marginal likelihoods if necessary
+    if ( useMarginalLikelihoods == true )
+    {
+        marginalLikelihoods = new double[numNodes*numSiteRates*numSites*numChars];
+        memcpy(marginalLikelihoods, n.marginalLikelihoods, numNodes*numSiteRates*pattern_block_size*numChars*sizeof(double));
+    }
     activeLikelihoodOffset      =  numNodes*numSiteRates*pattern_block_size*numChars;
     nodeOffset                  =  numSiteRates*pattern_block_size*numChars;
     mixtureOffset               =  pattern_block_size*numChars;
@@ -635,6 +651,12 @@ template<class charType, class treeType>
 double RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::computeLnProbability( void ) 
 {
 	
+    // if we are not in MCMC mode, then we need to (temporarily) allocate memory
+    if ( inMcmcMode == false )
+    {
+        partialLikelihoods = new double[2*numNodes*numSiteRates*numSites*numChars];
+    }
+    
     // compute the ln probability by recursively calling the probability calculation for each node
     const TopologyNode &root = tau->getValue().getRoot();
     
@@ -685,6 +707,16 @@ double RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::compu
         this->lnProb = sumRootLikelihood();
                 
     }
+    
+    
+    // if we are not in MCMC mode, then we need to (temporarily) free memory
+    if ( inMcmcMode == false )
+    {
+        // free the partial likelihoods
+        delete [] partialLikelihoods;
+        partialLikelihoods = NULL;
+    }
+    
     return this->lnProb;
 }
 
@@ -1395,19 +1427,37 @@ template<class charType, class treeType>
 void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::resizeLikelihoodVectors( void )
 {
     
-    // we resize the partial likelihood vectors to the new dimensions
-    delete [] partialLikelihoods;
-    delete [] marginalLikelihoods;
-    partialLikelihoods = new double[2*numNodes*numSiteRates*pattern_block_size*numChars];
-    marginalLikelihoods = new double[numNodes*numSiteRates*pattern_block_size*numChars];
+    // only do this if we are in MCMC mode. This will safe memory
+    if ( inMcmcMode == true )
+    {
+        // we resize the partial likelihood vectors to the new dimensions
+        delete [] partialLikelihoods;
     
-	// reinitialize likelihood vectors
-	for (size_t i = 0; i < 2*numNodes*numSiteRates*pattern_block_size*numChars; i++) {
-		partialLikelihoods[i] = 0.0;
-	}
-	for (size_t i = 0; i < numNodes*numSiteRates*pattern_block_size*numChars; i++) {
-		marginalLikelihoods[i] = 0.0;
-	}
+        partialLikelihoods = new double[2*numNodes*numSiteRates*pattern_block_size*numChars];
+        
+        // reinitialize likelihood vectors
+        for (size_t i = 0; i < 2*numNodes*numSiteRates*pattern_block_size*numChars; i++)
+        {
+            partialLikelihoods[i] = 0.0;
+        }
+        
+    }
+    
+    if ( useMarginalLikelihoods == true )
+    {
+        // we resize the partial likelihood vectors to the new dimensions
+        delete [] marginalLikelihoods;
+        
+        marginalLikelihoods = new double[numNodes*numSiteRates*pattern_block_size*numChars];
+        
+        // reinitialize likelihood vectors
+        for (size_t i = 0; i < numNodes*numSiteRates*pattern_block_size*numChars; i++)
+        {
+            marginalLikelihoods[i] = 0.0;
+        }
+        
+    }
+    
 	
     perNodeSiteLogScalingFactors = std::vector<std::vector< std::vector<double> > >(2, std::vector<std::vector<double> >(numNodes, std::vector<double>(pattern_block_size, 0.0) ) );
     
@@ -1733,6 +1783,31 @@ void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setCloc
     
 }
 
+
+/**
+ * Change the likelihood computation to or from MCMC mode.
+ */
+
+template<class charType, class treeType>
+void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setMcmcMode(bool tf)
+{
+    
+    // free old memory
+    if ( inMcmcMode == true )
+    {
+        delete [] partialLikelihoods;
+        partialLikelihoods = NULL;
+    }
+    
+    // set our internal flag
+    inMcmcMode = tf;
+    
+    if ( inMcmcMode == true )
+    {
+        resizeLikelihoodVectors();
+    }
+    
+}
 
 
 /**

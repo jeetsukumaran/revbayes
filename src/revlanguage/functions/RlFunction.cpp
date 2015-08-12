@@ -30,12 +30,9 @@ Function::Function(const Function &x) : RevObject( x ),
 
 
 /** Destructor. We need to free the arguments here. */
-Function::~Function(void) {
+Function::~Function(void)
+{
     
-#if defined ( DEBUG_MEMORY )
-    std::cerr << " Deleting function '" << name << "' <" << this << ">" << std::endl;
-#endif
-
     // we don't own the enclosing environment -> we don't delete it.
 }
 
@@ -466,11 +463,12 @@ std::string Function::getRevDeclaration(void) const
 
 
 /** Print value for user */
-void Function::printValue(std::ostream& o) const {
+void Function::printValue(std::ostream& o) const
+{
 
     const ArgumentRules& argRules = getArgumentRules();
 
-    o << getReturnType().getType() << " function (";
+    o << name << " (";
     for (size_t i=0; i<argRules.size(); i++)
     {
         if (i != 0)
@@ -582,10 +580,13 @@ void Function::processArguments( const std::vector<Argument>& passedArgs, bool o
         /* Check for matches in all regular rules (we assume that all labels are unique; this is checked by FunctionTable) */
         for (size_t j=0; j<nRules; j++) {
 
-            if ( passedArgs[i].getLabel() == theRules[j].getArgumentLabel() ) {
+            if ( passedArgs[i].getLabel() == theRules[j].getArgumentLabel() )
+            {
 
                 if ( filled[j] )
+                {
                     throw RbException( "Duplicate argument labels '" + passedArgs[i].getLabel() );
+                }
                 
                 pArgs[i]            = theRules[j].fitArgument( pArgs[i], once );
                 taken[i]            = true;
@@ -731,8 +732,11 @@ void Function::processArguments( const std::vector<Argument>& passedArgs, bool o
     /*********************  5. Insert arguments into argument list  **********************/
     for (size_t j=0; j<nRules; j++) 
     {
-        if ( passedArgIndex[j] < 1000 ) 
+        if ( passedArgIndex[j] < 1000 )
+        {
             args.push_back( pArgs[ passedArgIndex[j] ] );
+        }
+        
     }
     
     /*********************  6. Insert ellipsis arguments  **********************/
@@ -744,14 +748,16 @@ void Function::processArguments( const std::vector<Argument>& passedArgs, bool o
 }
 
 
-void Function::setExecutionEnviroment(Environment *e) {
+void Function::setExecutionEnviroment(Environment *e)
+{
     
     env = e;
 
 }
 
 /** Set name of function */
-void Function::setName(const std::string& nm) {
+void Function::setName(const std::string& nm)
+{
     
     name = nm;
 }

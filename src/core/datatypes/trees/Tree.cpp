@@ -225,6 +225,11 @@ void Tree::executeMethod(const std::string &n, const std::vector<const DagNode *
     
 }
 
+size_t Tree::getTipIndex(std::string name) const
+{
+    return topology->getTipIndex( name );
+}
+
 std::vector<std::string> Tree::getTipNames() const
 {
 
@@ -291,8 +296,7 @@ const std::string& Tree::getNewickRepresentation() const
 
 TopologyNode& Tree::getRoot(void)
 {
-    //return *topology->getNodes()[topology->getNumberOfNodes()-1];
-    return topology->getRoot(); //SK
+    return topology->getRoot();
 }
 
 const TopologyNode& Tree::getRoot(void) const
@@ -309,6 +313,22 @@ const TopologyNode& Tree::getTipNode(size_t indx) const
 {
     
     return topology->getTipNode(indx);
+}
+
+TopologyNode& Tree::getTipNodeWithName( const std::string &n )
+{
+    return topology->getTipNodeWithName( n );
+}
+
+const TopologyNode& Tree::getTipNodeWithName( const std::string &n ) const
+{
+    
+    return topology->getTipNodeWithName( n );
+}
+
+std::vector<TopologyNode*> Tree::getTipNodesWithSpeciesName( const std::string &n )
+{
+    return topology->getTipNodesWithSpeciesName( n );
 }
 
 

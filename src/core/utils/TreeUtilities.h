@@ -29,9 +29,10 @@ namespace RevBayesCore {
         // these function are for public use
         TimeTree*       convertTree(const Tree &t);
 //        AdmixtureTree*  convertToAdmixtureTree(const Tree &t, std::vector<std::string> names); // , const std::vector<std::string> names);
-        void            rescaleSubtree(TimeTree *t, TopologyNode *n, double factor);
+        void            rescaleSubtree(TimeTree *t, TopologyNode *n, double factor, bool v=false);
         void            rescaleTree(TimeTree *t, TopologyNode *n, double factor);
         void            getOldestTip(TimeTree* t, TopologyNode *n, double& oldest);
+        void            getTaxaInSubtree(TopologyNode *n, std::vector<TopologyNode*> &taxa );
         std::string     uniqueNewickTopology(const Tree &t);
     
         // internal helper functions

@@ -213,9 +213,9 @@ void MonteCarloAnalysis::printPerformanceSummary( void ) const
 }
 
 
-void MonteCarloAnalysis::run( RbVector<StoppingRule> rules )
+void MonteCarloAnalysis::run( size_t kIterations, RbVector<StoppingRule> rules )
 {
-    /* Let user know what we are doing */
+    // Let user know what we are doing
     std::stringstream ss;
     if ( runs[0]->getCurrentGeneration() == 0 )
     {
@@ -235,19 +235,10 @@ void MonteCarloAnalysis::run( RbVector<StoppingRule> rules )
         // Monitor
         for (size_t i=0; i<replicates; ++i)
         {
-            runs[i]->startMonitors();
+            runs[i]->startMonitors( kIterations );
             runs[i]->monitor(0);
         }
     }
-    
-    /* Reset the monitors */
-//    for (size_t i=0; i<replicates; ++i)
-//    {
-//        for (size_t j=0; i<runs[i].getMonitors().size(); i++)
-//        {
-//            runs[i].getMonitors()[j].reset( kIterations);
-//        }
-//    }
     
     // reset the counters for the move schedules
     for (size_t i=0; i<replicates; ++i)
@@ -309,10 +300,10 @@ void MonteCarloAnalysis::run( RbVector<StoppingRule> rules )
 
 
 
-void MonteCarloAnalysis::runPriorSampler( RbVector<StoppingRule> rules )
+void MonteCarloAnalysis::runPriorSampler( size_t kIterations , RbVector<StoppingRule> rules )
 {
     
-    /* Let user know what we are doing */
+    // Let user know what we are doing
     std::stringstream ss;
     if ( runs[0]->getCurrentGeneration() == 0 )
     {
@@ -338,19 +329,10 @@ void MonteCarloAnalysis::runPriorSampler( RbVector<StoppingRule> rules )
         // Monitor
         for (size_t i=0; i<replicates; ++i)
         {
-            runs[i]->startMonitors();
+            runs[i]->startMonitors( kIterations );
             runs[i]->monitor(0);
         }
     }
-    
-    /* Reset the monitors */
-    //    for (size_t i=0; i<replicates; ++i)
-    //    {
-    //        for (size_t j=0; i<runs[i].getMonitors().size(); i++)
-    //        {
-    //            runs[i].getMonitors()[j].reset( kIterations);
-    //        }
-    //    }
     
     // reset the counters for the move schedules
     for (size_t i=0; i<replicates; ++i)

@@ -15,7 +15,7 @@ namespace RevBayesCore {
     class DiscreteTaxonData : public AbstractDiscreteTaxonData {
     
     public:
-        DiscreteTaxonData(const std::string &tname);                                                                //!< Set type spec of container from type of elements
+                                                DiscreteTaxonData(const std::string &tname);                        //!< Set type spec of container from type of elements
     
         charType&                               operator[](size_t i);                                               //!< Index op allowing change
         const charType&                         operator[](size_t i) const;                                         //!< Const index op
@@ -54,7 +54,6 @@ namespace RevBayesCore {
     // Global functions using the class
     template<class charType>
     std::ostream&                       operator<<(std::ostream& o, const DiscreteTaxonData<charType>& x);          //!< Overloaded output operator
-
     
 }
 
@@ -360,7 +359,7 @@ double RevBayesCore::DiscreteTaxonData<charType>::getPercentageMissing( void ) c
     double numMissing = 0.0;
     for (size_t i = 0; i < sequence.size(); ++i)
     {
-        if ( sequence[i].isMissingState() == true )
+        if ( sequence[i].isMissingState() == true || sequence[i].isGapState() == true )
         {
             ++numMissing;
         }
@@ -412,7 +411,7 @@ bool RevBayesCore::DiscreteTaxonData<charType>::isSequenceMissing( void ) const
     
     for (size_t i = 0; i < sequence.size(); ++i)
     {
-        if ( sequence[i].isMissingState() == false )
+        if ( sequence[i].isMissingState() == false && sequence[i].isGapState() == false )
         {
             return false;
         }

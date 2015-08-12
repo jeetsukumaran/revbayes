@@ -47,11 +47,15 @@ MetropolisHastingsMove::MetropolisHastingsMove( Proposal *p, double w, bool t ) 
     }
     
     // remove all "core" nodes from affectedNodes so their probabilities are not double-counted
-    for (std::set<DagNode*>::iterator it = affectedNodes.begin(); it != affectedNodes.end(); it++)
+    for (size_t i = 0; i < affectedNodes.size(); ++i)
     {
+        std::set<DagNode*>::iterator it = affectedNodes.begin();
+        std::advance(it, i);
+        
         if ( nodes.find(*it) != nodes.end() )
         {
             affectedNodes.erase(*it);
+            --i;
         }
     }
 }
@@ -208,6 +212,21 @@ void MetropolisHastingsMove::performMove( double lHeat, double pHeat )
     proposal->prepareProposal();
     double lnHastingsRatio = proposal->doProposal();
     
+    
+    affectedNodes.clear();
+    for (std::set<DagNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+    {
+        (*it)->getAffectedNodes( affectedNodes );
+    }
+    for (std::set<DagNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+    {
+        DagNode *the_node = *it;
+        if ( affectedNodes.find(the_node) != affectedNodes.end() )
+        {
+            affectedNodes.erase(the_node);
+        }
+    }
+    
     // first we touch all the nodes
     // that will set the flags for recomputation
     for (std::set<DagNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it)
@@ -221,26 +240,34 @@ void MetropolisHastingsMove::performMove( double lHeat, double pHeat )
     // compute the probability of the current value for each node
     for (std::set<DagNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it)
     {
-        if ( (*it)->isClamped() )
+        DagNode *the_node = *it;
+        if ( RbMath::isAComputableNumber(lnPriorRatio) && RbMath::isAComputableNumber(lnLikelihoodRatio) && RbMath::isAComputableNumber(lnHastingsRatio) )
         {
-            lnLikelihoodRatio += (*it)->getLnProbabilityRatio();
-        }
-        else
-        {
-            lnPriorRatio += (*it)->getLnProbabilityRatio();
+            if ( the_node->isClamped() )
+            {
+                lnLikelihoodRatio += the_node->getLnProbabilityRatio();
+            }
+            else
+            {
+                lnPriorRatio += the_node->getLnProbabilityRatio();
+            }
         }
     }
     
     // then we recompute the probability for all the affected nodes
     for (std::set<DagNode*>::iterator it = affectedNodes.begin(); it != affectedNodes.end(); ++it) 
     {
-        if ( (*it)->isClamped() )
+        DagNode *the_node = *it;
+        if ( RbMath::isAComputableNumber(lnPriorRatio) && RbMath::isAComputableNumber(lnLikelihoodRatio) && RbMath::isAComputableNumber(lnHastingsRatio) )
         {
-            lnLikelihoodRatio += (*it)->getLnProbabilityRatio();
-        }
-        else
-        {
-            lnPriorRatio += (*it)->getLnProbabilityRatio();
+            if ( the_node->isClamped() )
+            {
+                lnLikelihoodRatio += the_node->getLnProbabilityRatio();
+            }
+            else
+            {
+                lnPriorRatio += the_node->getLnProbabilityRatio();
+            }
         }
     }
     
@@ -248,7 +275,7 @@ void MetropolisHastingsMove::performMove( double lHeat, double pHeat )
     double lnPosteriorRatio;
     lnPosteriorRatio = pHeat * (lHeat * lnLikelihoodRatio + lnPriorRatio);
 	
-	if ( !RbMath::isAComputableNumber(lnPosteriorRatio) )
+	if ( RbMath::isAComputableNumber(lnPosteriorRatio) == false )
     {
 		
             proposal->undoProposal();

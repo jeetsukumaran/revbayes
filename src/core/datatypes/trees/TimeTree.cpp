@@ -1,20 +1,3 @@
-/**
- * @file
- * This file contains the implementation of a time-calibrated tree. This version of a tree
- * contains nodes with times.
- *
- * @brief Implementation of a time calibrated tree
- *
- * (c) Copyright 2009- under GPL version 3
- * @date Last modified: $Date: 2012-07-05 16:47:08 +0200 (Thu, 05 Jul 2012) $
- * @author The RevBayes core development team
- * @license GPL version 3
- * @version 1.0
- * @since 2012-07-17, version 1.0
- *
- * $Id: TimeTree.cpp 1651 2012-07-05 14:47:08Z hoehna $
- */
-
 #include "TimeTree.h"
 #include "RbException.h"
 #include "RbOptions.h"
@@ -25,17 +8,8 @@
 using namespace RevBayesCore;
 
 /* Default constructor */
-TimeTree::TimeTree(void) : Tree() {
-    
-}
-
-
-/* Copy constructor */
-TimeTree::TimeTree(const TimeTree& t) : Tree( t )
+TimeTree::TimeTree(void) : Tree()
 {
-    
-//    times = t.times;
-    ages  = t.ages;
     
 }
 
@@ -44,22 +18,6 @@ TimeTree::TimeTree(const TimeTree& t) : Tree( t )
 TimeTree::~TimeTree(void)
 {
     
-}
-
-
-TimeTree& TimeTree::operator=(const TimeTree &t)
-{
-    
-    if (this != &t)
-    {
-        Tree::operator=(t);
-        
-        ages      = t.ages;
-//        times     = t.times;
-        
-    }
-    
-    return *this;
 }
 
 
@@ -111,11 +69,15 @@ double TimeTree::getTime(size_t idx) const
 }
 
 
-double TimeTree::getTreeLength(void) const {
+double TimeTree::getTreeLength(void) const
+{
     double treeLength = 0;
     const std::vector<TopologyNode*> &nodes = topology->getNodes();
     for (size_t i = 0; i < nodes.size(); i++)
+    {
         treeLength += nodes[i]->getBranchLength();
+    }
+    
     return treeLength;
 }
 

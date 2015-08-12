@@ -61,6 +61,7 @@ namespace RevBayesCore {
         virtual void                                        reInitializeMe(void);                                                       //!< The DAG was re-initialized so maybe you want to reset some stuff (delegate to distribution)
         virtual void                                        setClamped(bool tf);                                                        //!< Set directly the flag whether this node is clamped.
         void                                                setIgnoreRedraw(bool tf=true);
+        void                                                setMcmcMode(bool tf);                                                       //!< Set the modus of the DAG node to MCMC mode.
         virtual void                                        setValue(valueType *val, bool touch=true);                                  //!< Set the value of this node
         void                                                unclamp(void);                                                              //!< Unclamp the variable
         
@@ -517,6 +518,16 @@ void RevBayesCore::StochasticNode<valueType>::setNumberOfProcessesSpecialized(si
 {
     
     distribution->setNumberOfProcesses( n, offset );
+}
+
+
+
+template<class valueType>
+void RevBayesCore::StochasticNode<valueType>::setMcmcMode(bool tf)
+{
+    
+    distribution->setMcmcMode( tf );
+    
 }
 
 

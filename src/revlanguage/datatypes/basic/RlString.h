@@ -29,11 +29,13 @@ namespace RevLanguage {
             void                            printValue(std::ostream& o, bool toScreen) const;       //!< Print value (for user)
         
         protected:
-            void                            printValue(std::ostream& o) const;                      //!< Print value (for user)
         
-        
+            void                            printValue(std::ostream& o) const;                      //!< Print value for user
+
         private:
+        
             void                            parseValue(void);
+   
     };
     
 }
