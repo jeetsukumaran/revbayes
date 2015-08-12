@@ -65,7 +65,7 @@
 
 /* Character data types (in folder "datatypes/evolution/datamatrix") */
 #include "RlAbstractCharacterData.h"
-#include "RlDiscreteCharacterData.h"
+#include "RlHomologousDiscreteCharacterData.h"
 
 /* Tree types (in folder "datatypes/evolution/trees") */
 #include "RlClade.h"
@@ -257,6 +257,8 @@
 #include "Func_readCharacterDataDelimited.h"
 #include "Func_readContinuousCharacterData.h"
 #include "Func_readDiscreteCharacterData.h"
+#include "Func_readDistanceMatrix.h"
+#include "Func_readCharacterDataUniversal.h"
 #include "Func_readTrace.h"
 #include "Func_readTrees.h"
 #include "Func_readBranchLengthTrees.h"
@@ -366,6 +368,7 @@ void RevLanguage::Workspace::initializeBasicGlobalWorkspace(void)
         addFunction( "tmrca",                       new Func_tmrca()                    );
         addFunction( "treeAssembly",                new Func_treeAssembly()             );
         addFunction( "treeScale",                   new Func_treeScale()                );
+		
 
         // type conversion
 //        addFunction( "_Natural2Integer",            new Func__conversion<Natural, Integer>()        );
@@ -405,6 +408,8 @@ void RevLanguage::Workspace::initializeBasicGlobalWorkspace(void)
 		addFunction( "readBranchLengthTrees",       new Func_readBranchLengthTrees()        );
         addFunction( "readContinuousCharacterData", new Func_readContinuousCharacterData()  );
         addFunction( "readDiscreteCharacterData",   new Func_readDiscreteCharacterData()    );
+		addFunction( "readDistanceMatrix", 		    new Func_readDistanceMatrix()    );
+        addFunction( "readCharacterData",           new Func_readCharacterDataUniversal()   );
         addFunction( "readTaxonData",               new Func_TaxonReader()                  );
         addFunction( "readTrace",                   new Func_readTrace()                    );
         addFunction( "readTrees",                   new Func_readTrees()                    );
@@ -488,8 +493,8 @@ void RevLanguage::Workspace::initializeBasicGlobalWorkspace(void)
         addFunction("runif", new DistributionFunctionRv<RealPos>( new Dist_unifPositive() ) );
         
         
-        addFunction("rPhyloCTMC", new DistributionFunctionRv< AbstractDiscreteCharacterData >( new Dist_phyloCTMC<TimeTree>() ) );
-        addFunction("rPhyloCTMC", new DistributionFunctionRv< AbstractDiscreteCharacterData >( new Dist_phyloCTMC<BranchLengthTree>() ) );
+        addFunction("rPhyloCTMC", new DistributionFunctionRv< AbstractHomologousDiscreteCharacterData >( new Dist_phyloCTMC<TimeTree>() ) );
+        addFunction("rPhyloCTMC", new DistributionFunctionRv< AbstractHomologousDiscreteCharacterData >( new Dist_phyloCTMC<BranchLengthTree>() ) );
 
 
     }

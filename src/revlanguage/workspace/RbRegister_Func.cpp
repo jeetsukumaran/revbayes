@@ -113,6 +113,7 @@
 #include "Func_symmetricDifference.h"
 #include "Func_tmrca.h"
 #include "Func_treeAssembly.h"
+#include "Func_treePairwiseDistances.h"
 #include "Func_treeScale.h"
 
 
@@ -211,6 +212,7 @@
 #include "Func_readCharacterDataDelimited.h"
 #include "Func_readContinuousCharacterData.h"
 #include "Func_readDiscreteCharacterData.h"
+#include "Func_readDistanceMatrix.h"
 #include "Func_readTrace.h"
 #include "Func_readTrees.h"
 #include "Func_readBranchLengthTrees.h"
@@ -226,7 +228,9 @@
 
 /* Math functions (in folder "functions/math") */
 #include "Func_abs.h"
+#include "Func_absVector.h"
 #include "Func_ceil.h"
+#include "Func_coala.h"
 #include "Func_diagonalMatrix.h"
 #include "Func_exp.h"
 #include "Func_floor.h"
@@ -311,8 +315,11 @@ void RevLanguage::Workspace::initializeFuncGlobalWorkspace(void)
         addFunction( "fnDECRoot",           new Func_DECRoot() );
         addFunction( "fnPD",                new Func_phyloDiversity<BranchLengthTree>() );
         addFunction( "fnPD",                new Func_phyloDiversity<TimeTree>() );
-        
-        
+		
+		/* Functions related to phylogenetic trees (in folder "functions/phylogenetics/tree") */
+		addFunction( "fnTreePairwiseDistances",        new Func_treePairwiseDistances<BranchLengthTree>() );
+		addFunction( "fnTreePairwiseDistances",        new Func_treePairwiseDistances<TimeTree>() );
+		
         /* Population genetics functions (in folder "functions/popgen") */
         addFunction( "fnSegregatingSites",  new Func_SegregatingSites() );
         addFunction( "fnTajimasD",          new Func_TajimasD()         );
@@ -456,13 +463,17 @@ void RevLanguage::Workspace::initializeFuncGlobalWorkspace(void)
         /* Math functions (in folder "functions/math") */
 		
 		// absolute function
-        addFunction( "abs",         new Func_abs()  );
+        addFunction( "abs",         new Func_abs()                  );
+        addFunction( "abs",         new Func_absVector()            );
 		
 		// ceil function
         addFunction( "ceil",        new Func_ceil<Real,Integer>()  );
         addFunction( "ceil",        new Func_ceil<RealPos,Natural>()  );
         addFunction( "ceiling",     new Func_ceil<Real,Integer>()  );
         addFunction( "ceiling",     new Func_ceil<RealPos,Natural>()  );
+        
+        // coala function
+        addFunction( "fnCoala",     new Func_coala()        );
         
         // diagonal matrix
         addFunction( "diag",         new Func_diagonalMatrix() );

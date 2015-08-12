@@ -69,6 +69,7 @@ namespace RevBayesCore {
         std::set<const DagNode*>                            getParents(void) const;                                                     //!< Get the set of parents
         void                                                swapParent(const DagNode *oldP, const DagNode *newP);                       //!< Exchange the parent (distribution parameter)
         
+        
     protected:
         
         virtual void                                        getAffected(std::set<DagNode *>& affected, DagNode* affecter);              //!< Mark and get affected nodes
@@ -123,8 +124,7 @@ RevBayesCore::StochasticNode<valueType>::StochasticNode( const std::string &n, T
 
 
 template<class valueType>
-RevBayesCore::StochasticNode<valueType>::StochasticNode( const StochasticNode<valueType> &n ) :
-    DynamicNode<valueType>( n ),
+RevBayesCore::StochasticNode<valueType>::StochasticNode( const StochasticNode<valueType> &n ) : DynamicNode<valueType>( n ),
     clamped( n.clamped ),
     ignoreRedraw(n.ignoreRedraw),
     needsProbabilityRecalculation( true ),
@@ -271,7 +271,8 @@ RevBayesCore::TypedDistribution<valueType>& RevBayesCore::StochasticNode<valueTy
 
 
 template<class valueType>
-const RevBayesCore::TypedDistribution<valueType>& RevBayesCore::StochasticNode<valueType>::getDistribution( void ) const {
+const RevBayesCore::TypedDistribution<valueType>& RevBayesCore::StochasticNode<valueType>::getDistribution( void ) const
+{
     
     return *distribution;
 }
@@ -292,12 +293,6 @@ double RevBayesCore::StochasticNode<valueType>::getLnProbability( void )
         {
             lnProb = 0.0;
         }
-        
-//        if ( RbMath::isAComputableNumber(lnProb) == false )
-//        {
-//            std::cerr << "Could not compute lnProb:\t" << lnProb << std::endl;
-//            distribution->computeLnProbability();
-//        }
         
         // reset flag
         needsProbabilityRecalculation = false;
@@ -586,7 +581,7 @@ template<class valueType>
 void RevBayesCore::StochasticNode<valueType>::touchMe( DagNode *toucher, bool touchAll )
 {
     
-    if (!this->touched)
+    if ( this->touched == false )
     {
         storedLnProb = lnProb;
     }

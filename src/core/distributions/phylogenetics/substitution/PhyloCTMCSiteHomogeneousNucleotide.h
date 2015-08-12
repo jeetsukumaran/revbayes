@@ -592,7 +592,7 @@ void RevBayesCore::PhyloCTMCSiteHomogeneousNucleotide<charType, treeType>::compu
                 // get the original character
                 unsigned long org_val = char_node[site];
                                     
-                if ( this->usingAmbiguousCharacters )
+                if ( this->usingAmbiguousCharacters == true )
                 {                
                     
                     double p0 = 0.0;

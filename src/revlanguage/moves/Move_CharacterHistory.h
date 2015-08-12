@@ -45,13 +45,13 @@ namespace RevLanguage {
         
         void                                        setConstParameter(const std::string& name, const RevPtr<const RevVariable> &var);         //!< Set member variable
         
-        RevPtr<const RevVariable>                      ctmc;                                                                                       //!< The variable on which the move works
-        RevPtr<const RevVariable>                      qmap;                                                                                          //!< The variable on which the move works
-        RevPtr<const RevVariable>                      tree;                                                                                          //!< The variable on which the move works
-        RevPtr<const RevVariable>                      lambda;                                                                                     //!< The tuning parameter used.
-        RevPtr<const RevVariable>                      type;
-        RevPtr<const RevVariable>                      graph;
-        RevPtr<const RevVariable>                      proposal;
+        RevPtr<const RevVariable>                   ctmc;                                                                                       //!< The variable on which the move works
+        RevPtr<const RevVariable>                   qmap;                                                                                          //!< The variable on which the move works
+        RevPtr<const RevVariable>                   tree;                                                                                          //!< The variable on which the move works
+        RevPtr<const RevVariable>                   lambda;                                                                                     //!< The tuning parameter used.
+        RevPtr<const RevVariable>                   type;
+        RevPtr<const RevVariable>                   graph;
+        RevPtr<const RevVariable>                   proposal;
         
     };
     
@@ -72,7 +72,6 @@ namespace RevLanguage {
 #include "BiogeographicTreeHistoryCtmc.h"
 #include "BiogeographyNodeRejectionSampleProposal.h"
 #include "BiogeographyPathRejectionSampleProposal.h"
-#include "PathRejectionSampleMove.h"
 #include "NodeRejectionSampleProposal.h"
 #include "PathUniformizationSampleProposal.h"
 #include "NodeUniformizationSampleProposal.h"
@@ -87,7 +86,7 @@ namespace RevLanguage {
 #include "Real.h"
 #include "RealPos.h"
 #include "RevObject.h"
-#include "RlAbstractDiscreteCharacterData.h"
+#include "RlAbstractHomologousDiscreteCharacterData.h"
 #include "RlBoolean.h"
 #include "RlRateMap.h"
 #include "RlString.h"
@@ -96,8 +95,6 @@ namespace RevLanguage {
 #include "TypedDagNode.h"
 #include "TypeSpec.h"
 
-// to be removed once MH moves work
-#include "PathRejectionSampleMove.h"
 #include "StandardState.h"
 
 
@@ -153,10 +150,10 @@ void RevLanguage::Move_CharacterHistory<treeType>::constructInternalObject( void
     std::string pt  = static_cast<const RlString &>( proposal->getRevObject() ).getValue();
     
     // move/proposal parameters
-    RevBayesCore::TypedDagNode<RevBayesCore::AbstractDiscreteCharacterData>* ctmc_tdn   = static_cast<const RevLanguage::AbstractDiscreteCharacterData&>( ctmc->getRevObject() ).getDagNode();
+    RevBayesCore::TypedDagNode<RevBayesCore::AbstractHomologousDiscreteCharacterData>* ctmc_tdn   = static_cast<const RevLanguage::AbstractHomologousDiscreteCharacterData&>( ctmc->getRevObject() ).getDagNode();
     RevBayesCore::TypedDagNode<RevBayesCore::RateMap>* qmap_tdn                 = static_cast<const RateMap&>( qmap->getRevObject() ).getDagNode();
     RevBayesCore::TypedDagNode<typename treeType::valueType>* tree_tdn          = static_cast<const treeType&>( tree->getRevObject() ).getDagNode();
-    RevBayesCore::StochasticNode<RevBayesCore::AbstractDiscreteCharacterData>* ctmc_sn  = static_cast<RevBayesCore::StochasticNode<RevBayesCore::AbstractDiscreteCharacterData>* >(ctmc_tdn);
+    RevBayesCore::StochasticNode<RevBayesCore::AbstractHomologousDiscreteCharacterData>* ctmc_sn  = static_cast<RevBayesCore::StochasticNode<RevBayesCore::AbstractHomologousDiscreteCharacterData>* >(ctmc_tdn);
     RevBayesCore::DeterministicNode<RevBayesCore::RateMap>* qmap_dn             = static_cast<RevBayesCore::DeterministicNode<RevBayesCore::RateMap>* >(qmap_tdn);
     RevBayesCore::StochasticNode<typename treeType::valueType>* tree_sn         = static_cast<RevBayesCore::StochasticNode<typename treeType::valueType>* >(tree_tdn);
     
@@ -178,13 +175,17 @@ void RevLanguage::Move_CharacterHistory<treeType>::constructInternalObject( void
         {
 //            RevBayesCore::Proposal* p2 = new RevBayesCore::BiogeographyPathRejectionSampleProposal<RevBayesCore::StandardState, typename treeType::valueType>(ctmc_sn, tree_sn, qmap_dn, d);
             p = new RevBayesCore::BiogeographyNodeRejectionSampleProposal<RevBayesCore::StandardState, typename treeType::valueType>(ctmc_sn, tree_sn, qmap_dn, d);
-            value = new RevBayesCore::PathRejectionSampleMove<RevBayesCore::StandardState, typename treeType::valueType>(ctmc_sn, tree_sn, qmap_dn, p, d, false, w);
+//            value = new RevBayesCore::PathRejectionSampleMove<RevBayesCore::StandardState, typename treeType::valueType>(ctmc_sn, tree_sn, qmap_dn, p, d, false, w);
+            value = new RevBayesCore::MetropolisHastingsMove(p, w, false);
+
             return;
         }
         else if (gt == "branch")
         {
             p = new RevBayesCore::BiogeographyPathRejectionSampleProposal<RevBayesCore::StandardState, typename treeType::valueType>(ctmc_sn, tree_sn, qmap_dn, d);
-            value = new RevBayesCore::PathRejectionSampleMove<RevBayesCore::StandardState, typename treeType::valueType>(ctmc_sn, tree_sn, qmap_dn, p, d, false, w);
+//            value = new RevBayesCore::PathRejectionSampleMove<RevBayesCore::StandardState, typename treeType::valueType>(ctmc_sn, tree_sn, qmap_dn, p, d, false, w);
+            value = new RevBayesCore::MetropolisHastingsMove(p, w, false);
+
             return;
         }
     }
@@ -287,9 +288,9 @@ const MemberRules& RevLanguage::Move_CharacterHistory<treeType>::getParameterRul
     if ( !rulesSet )
     {
         
-        nodeChrsMoveMemberRules.push_back( new ArgumentRule( "ctmc", AbstractDiscreteCharacterData::getClassTypeSpec(), ArgumentRule::BY_REFERENCE, ArgumentRule::STOCHASTIC ) );
-        nodeChrsMoveMemberRules.push_back( new ArgumentRule( "qmap", RateMap::getClassTypeSpec()                      , ArgumentRule::BY_REFERENCE, ArgumentRule::STOCHASTIC ) );
-        nodeChrsMoveMemberRules.push_back( new ArgumentRule( "tree", treeType::getClassTypeSpec()                     , ArgumentRule::BY_REFERENCE, ArgumentRule::STOCHASTIC ) );
+        nodeChrsMoveMemberRules.push_back( new ArgumentRule( "ctmc", AbstractHomologousDiscreteCharacterData::getClassTypeSpec(), ArgumentRule::BY_REFERENCE, ArgumentRule::STOCHASTIC ) );
+        nodeChrsMoveMemberRules.push_back( new ArgumentRule( "qmap", RateMap::getClassTypeSpec()                      , ArgumentRule::BY_REFERENCE, ArgumentRule::ANY ) );
+        nodeChrsMoveMemberRules.push_back( new ArgumentRule( "tree", treeType::getClassTypeSpec()                     , ArgumentRule::BY_REFERENCE, ArgumentRule::ANY ) );
         nodeChrsMoveMemberRules.push_back( new ArgumentRule( "lambda", Probability::getClassTypeSpec()                , ArgumentRule::BY_VALUE    , ArgumentRule::ANY, new Probability(1.0) ) );
         
         std::vector<std::string> optionsType;

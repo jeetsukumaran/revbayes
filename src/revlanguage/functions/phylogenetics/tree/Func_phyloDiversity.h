@@ -103,8 +103,8 @@ const ArgumentRules& Func_phyloDiversity<treeType>::getArgumentRules( void ) con
 template <class treeType>
 const std::string& Func_phyloDiversity<treeType>::getClassType(void) {
     
-    static std::string revType = "Func_phyloDiversity";
-    
+    static std::string revType = "Func_phyloDiversity <" + treeType::getClassType() + ">";
+
     return revType;
 }
 
@@ -112,8 +112,8 @@ const std::string& Func_phyloDiversity<treeType>::getClassType(void) {
 template <class treeType>
 const TypeSpec& Func_phyloDiversity<treeType>::getClassTypeSpec(void) {
     
-    static TypeSpec revTypeSpec = TypeSpec( getClassType(), new TypeSpec( Function::getClassTypeSpec() ) );
-    
+	static TypeSpec revTypeSpec = TypeSpec( getClassType(), new TypeSpec( TypedFunction<treeType>::getClassTypeSpec() ) );
+	
     return revTypeSpec;
 }
 

@@ -55,27 +55,35 @@
 #include "RealPos.h"
 
 /* Container types (in folder "datatypes/container") */
+#include "RlCorrespondenceAnalysis.h"
+#include "RlMatrixReal.h"
+#include "RlMatrixRealSymmetric.h"
+#include "RlRateMap.h"
+#include "RlRateMatrix.h"
+#include "RlSimplex.h"
+
+/* Container types (in folder "datatypes/math") */
 #include "ModelVector.h"
 #include "WorkspaceVector.h"
 
-/* Evolution types (in folder "datatypes/evolution") */
+/* Evolution types (in folder "datatypes/phylogenetics") */
 
-/* Character state types (in folder "datatypes/evolution/character") */
+/* Character state types (in folder "datatypes/phylogenetics/character") */
 #include "RlAminoAcidState.h"
 #include "RlDnaState.h"
 #include "RlRnaState.h"
 #include "RlStandardState.h"
 
-/* Character data types (in folder "datatypes/evolution/datamatrix") */
+/* Character data types (in folder "datatypes/phylogenetics/datamatrix") */
 #include "RlAbstractCharacterData.h"
-#include "RlDiscreteCharacterData.h"
+#include "RlHomologousDiscreteCharacterData.h"
 
-/* Tree types (in folder "datatypes/evolution/trees") */
+/* Tree types (in folder "datatypes/phylogenetics/trees") */
 #include "RlClade.h"
 #include "RlRootedTripletDistribution.h"
 
 
-/* Taxon types (in folder "datatypes/evolution") */
+/* Taxon types (in folder "datatypes/phylogenetics") */
 #include "RlTaxon.h"
 
 /* Inference types (in folder "analysis") */
@@ -93,13 +101,6 @@
 #include "RlGelmanRubinStoppingRule.h"
 #include "RlGewekeStoppingRule.h"
 #include "RlStationarityStoppingRule.h"
-
-/* Math types (in folder "datatypes/math") */
-#include "RlMatrixReal.h"
-#include "RlMatrixRealSymmetric.h"
-#include "RlRateMap.h"
-#include "RlRateMatrix.h"
-#include "RlSimplex.h"
 
 
 /// Types ///
@@ -139,7 +140,7 @@ void RevLanguage::Workspace::initializeTypeGlobalWorkspace(void)
         
         
         AddWorkspaceVectorType<RateGenerator,3>::addTypeToWorkspace( *this, new RateGenerator() );
-        AddWorkspaceVectorType<AbstractDiscreteCharacterData,3>::addTypeToWorkspace( *this, new AbstractDiscreteCharacterData() );
+        AddWorkspaceVectorType<AbstractHomologousDiscreteCharacterData,3>::addTypeToWorkspace( *this, new AbstractHomologousDiscreteCharacterData() );
         
         AddWorkspaceVectorType<TimeTree,3>::addTypeToWorkspace( *this, new TimeTree() );
 		AddWorkspaceVectorType<BranchLengthTree,3>::addTypeToWorkspace( *this, new BranchLengthTree() );
@@ -174,6 +175,7 @@ void RevLanguage::Workspace::initializeTypeGlobalWorkspace(void)
         addTypeWithConstructor( "taxon",            new Taxon() );
         
         /* Add math types (in folder "datatypes/math") */
+        addTypeWithConstructor( "CorrespondenceAnalysis",   new CorrespondenceAnalysis()                    );
         addType( new RateMap()              );
         addType( new MatrixReal()           );
 

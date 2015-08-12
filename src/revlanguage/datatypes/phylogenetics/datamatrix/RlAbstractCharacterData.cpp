@@ -70,6 +70,7 @@ MethodTable AbstractCharacterData::getCharacterDataMethods( void ) const
 /* Map calls to member methods */
 RevPtr<RevVariable> AbstractCharacterData::executeCharacterDataMethod(std::string const &name, const std::vector<Argument> &args, bool &found)
 {
+    
     if (name == "chartype")
     {
         found = true;
@@ -228,6 +229,27 @@ RevPtr<RevVariable> AbstractCharacterData::executeCharacterDataMethod(std::strin
     // not found a matching method
     found = false;
     return NULL;
+}
+
+
+
+
+/* Get Rev type of object */
+const std::string& AbstractCharacterData::getClassType(void)
+{
+    
+    static std::string revType = "AbstractCharacterData";
+    
+    return revType;
+}
+
+/* Get class type spec describing type of object */
+const TypeSpec& AbstractCharacterData::getClassTypeSpec(void)
+{
+    
+    static TypeSpec revTypeSpec = TypeSpec( getClassType(), new TypeSpec( RevObject::getClassTypeSpec() ) );
+    
+    return revTypeSpec;
 }
 
 
