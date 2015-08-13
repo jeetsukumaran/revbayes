@@ -184,8 +184,7 @@ void MetropolisHastingsMove::performMove( double lHeat, double pHeat )
     }
     
     // exponentiate with the chain heat
-    double lnPosteriorRatio;
-    lnPosteriorRatio = pHeat * (lHeat * lnLikelihoodRatio + lnPriorRatio);
+    double lnPosteriorRatio = pHeat * (lHeat * lnLikelihoodRatio + lnPriorRatio);
 	
 	if ( RbMath::isAComputableNumber(lnPosteriorRatio) == false )
     {

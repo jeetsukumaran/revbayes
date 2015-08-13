@@ -60,7 +60,7 @@ Mcmcmc::Mcmcmc(const Model& m, const RbVector<Move> &mv, const RbVector<Monitor>
         heatRanks.push_back(i);
         
         // add chain to pid's chain vector (smaller memory footprint)
-        if ( pid >= process_index_start && pid < process_index_end)
+        if ( pid >= process_index_start && pid < process_index_end )
         {
             // get chain heat
             double b = computeBeta(delta, i);
@@ -73,6 +73,7 @@ Mcmcmc::Mcmcmc(const Model& m, const RbVector<Move> &mv, const RbVector<Monitor>
             oneChain->setChainIndex( i );
             oneChain->setNumberOfProcesses( num_processes, process_index_start);
             chains[i] = oneChain;
+            chainHeats[i] = b;
         }
         else
         {
