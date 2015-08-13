@@ -37,6 +37,7 @@ Mcmcmc::Mcmcmc(const Model& m, const RbVector<Move> &mv, const RbVector<Monitor>
     chains.resize(numChains);
     chainValues.resize(numChains, 0.0);
     chainHeats.resize(numChains, 0.0);
+    pidOfChain.resize(numChains, 0);
     
     // assign chains to processors, instantiate Mcmc objects
     baseChain = new Mcmc(m, mv, mn);
