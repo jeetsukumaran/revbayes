@@ -125,23 +125,15 @@ RevLanguage::ParserInfo RevLanguage::Parser::breakIntoLines(const std::string& c
  * As long as we return to the bison code, bison takes care of deleting the syntax tree. However,
  * if we encounter a quit() call, we delete the syntax tree ourselves and exit immediately.
  */
-int RevLanguage::Parser::execute(SyntaxElement* root, Environment &env) const {
+int RevLanguage::Parser::execute(SyntaxElement* root, Environment &env) const
+{
 
     // don't execute command if we are in checking mode
-    if (RevLanguage::Parser::getParser().isChecking()) {
-#ifdef DEBUG_PARSER
-        std::cerr << "Command is not executed since parser is set checking mode.";
-#endif
+    if (RevLanguage::Parser::getParser().isChecking())
+    {
+        
         return 0;
     }
-
-#ifdef DEBUG_PARSER
-    // Print syntax tree
-    std::cerr << std::endl;
-    std::cerr << "Syntax tree root before execution:\n";
-    root->printValue(std::cerr);
-    std::cerr << std::endl;
-#endif
 
     // Declare a variable for the result
     RevPtr<RevVariable> result = NULL;
@@ -149,10 +141,9 @@ int RevLanguage::Parser::execute(SyntaxElement* root, Environment &env) const {
     //! Execute syntax tree
     try
     {
-#ifdef DEBUG_PARSER
-        printf("Parser getting the semantic value of the syntax tree...\n");
-#endif
+        
         result = root->evaluateContent(env);
+        
     }
     catch (RbException& rbException)
     {
@@ -160,9 +151,9 @@ int RevLanguage::Parser::execute(SyntaxElement* root, Environment &env) const {
         std::ostringstream msg;
 
         // Catch a quit request
-        if (rbException.getExceptionType() == RbException::QUIT)
+        if ( rbException.getExceptionType() == RbException::QUIT )
         {
-            delete( root);
+            delete root;
             
 #ifdef RB_MPI
             MPI::Finalize();
@@ -182,8 +173,12 @@ int RevLanguage::Parser::execute(SyntaxElement* root, Environment &env) const {
 
             const std::string& fxnName = theVariable->getIdentifier();
             const std::vector<Function*>& functions = Workspace::userWorkspace().getFunctionTable().findFunctions(fxnName);
-            if (functions.size() != 0) {
-                for (std::vector<Function*>::const_iterator i = functions.begin(); i != functions.end(); i++) {
+            if (functions.size() != 0)
+            {
+                
+                for (std::vector<Function*>::const_iterator i = functions.begin(); i != functions.end(); i++)
+                {
+                    
                     std::ostringstream s;
                     (*i)->printValue(s);
                     RBOUT(s.str());
@@ -192,14 +187,13 @@ int RevLanguage::Parser::execute(SyntaxElement* root, Environment &env) const {
                     // -- Fredrik
                     // RBOUT( (*i)->callSignature() );
                 }
+                
                 return 0;
             }
+            
         }
 
         // All other exceptions
-#ifdef DEBUG_PARSER
-        printf("Caught an exception\n");
-#endif
         rbException.print(msg);
         RBOUT(msg.str());
 
@@ -235,42 +229,46 @@ void RevLanguage::Parser::executeBaseVariable(void)
 }
 
 /** Give flex a line to parse */
-void RevLanguage::Parser::getline(char* buf, size_t maxsize) {
+void RevLanguage::Parser::getline(char* buf, size_t maxsize)
+{
 
-    if (!rrcommand.good()) {
+    if (!rrcommand.good())
+    {
         foundEOF = true;
         //        buf[0] = EOF;
         //        buf[1] = '\0';
         buf[0] = '\0';
-    } else {
+    }
+    else
+    {
         foundNewline = false;
         rrcommand.getline(buf, long(maxsize) - 3);
         // Deal with line endings in case getline uses non-Unix endings
         size_t i = strlen(buf);
         if (i >= 1 && buf[i - 1] == '\r')
+        {
             buf[i - 1] = '\n';
-        else if (i >= 2 && buf[i - 1] == '\n' && buf[i - 2] == '\r') {
+        }
+        else if (i >= 2 && buf[i - 1] == '\n' && buf[i - 2] == '\r')
+        {
             buf[i - 2] = '\n';
             i--;
-        } else if (i == 0 || (i >= 1 && buf[i - 1] != '\n')) {
+        }
+        else if (i == 0 || (i >= 1 && buf[i - 1] != '\n'))
+        {
             buf[i++] = '\n';
         }
         buf[i] = '\0';
+        
     }
 
 }
 
 /** This function gets help info about a symbol */
-int RevLanguage::Parser::help(const std::string& symbol) const {
+int RevLanguage::Parser::help(const std::string& symbol) const
+{
     
     std::ostringstream msg;
-    
-#	if defined DEBUG_PARSER
-    // Print syntax tree
-    std::cerr << std::endl;
-    std::cerr << "Parser trying to get help for symbol '" << symbol << "'";
-    std::cerr << std::endl;
-#	endif
     
     // Get some help
     RevBayesCore::RbHelpSystem& hs = RevBayesCore::RbHelpSystem::getHelpSystem();
@@ -329,17 +327,8 @@ int RevLanguage::Parser::help(const std::string& baseSymbol, const std::string& 
  * The function is called from the bison code, which is responsible for
  * deleting the syntax tree (the function call).
  */
-int RevLanguage::Parser::help(const SyntaxFunctionCall* root) const {
-    
-    std::ostringstream msg;
-    
-#	if defined DEBUG_PARSER
-    // Print syntax tree
-    std::cerr << std::endl;
-    std::cerr << "Syntax tree root before help:\n";
-    root->printValue(std::cerr);
-    std::cerr << std::endl;
-#	endif
+int RevLanguage::Parser::help(const SyntaxFunctionCall* root) const
+{
     
     RlString symbol = root->getFunctionName();
     
@@ -354,13 +343,16 @@ extern int yyparse(void); // Defined in grammar.tab.cpp (from gammar.y)
  * Parser::CHECKING for state checking and Parser::PROCESSING for
  * command processing.
  */
-void RevLanguage::Parser::setParserMode(ParserMode mode) {
+void RevLanguage::Parser::setParserMode(ParserMode mode)
+{
+
     baseVariable = NULL;
     functionName = "";
     argumentLabel = "";
     baseVariableExpr = NULL;
 
     parserMode = mode;
+
 }
 
 /**
@@ -377,7 +369,8 @@ void RevLanguage::Parser::setParserMode(ParserMode mode) {
  *       signal is set to 2. Any remaining part of the command buffer
  *       is discarded.
  */
-int RevLanguage::Parser::processCommand(std::string& command, Environment* env) {
+int RevLanguage::Parser::processCommand(std::string& command, Environment* env)
+{
 
     // make sure mode is not checking
     this->setParserMode(EXECUTING);
@@ -385,10 +378,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
     //    extern Environment* executionEnvironment;
 
     executionEnvironment = env;
-
-#ifdef DEBUG_PARSER
-    std::cerr << "Processing command ... " << std::endl;
-#endif
 
     // Break command into Rev lines
     std::list<std::string> lines;
@@ -398,10 +387,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
     }
     catch (RbException& rbException)
     {
-
-#ifdef DEBUG_PARSER
-        printf("Caught an exception while breaking command buffer into lines\n");
-#endif
 
         // Print message
         std::ostringstream msg;
@@ -438,10 +423,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
 #endif
 
 
-#ifdef DEBUG_PARSER
-        printf("\nCalling bison with rrcommand:\n'%s'\n", rrcommand.str().c_str());
-#endif
-
         int result;
         try
         {
@@ -449,9 +430,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
         }
         catch (RbException& rbException)
         {
-#ifdef DEBUG_PARSER
-            printf("Caught an exception\n");
-#endif
 
             // Catch a quit request in case it was not caught before
             if (rbException.getExceptionType() == RbException::QUIT)
@@ -465,9 +443,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
                 exit(0);
             }
             // All other uncaught exceptions
-#ifdef DEBUG_PARSER
-            printf("Abnormal exception during parsing or execution of statement; discarding any remaining command buffer\n");
-#endif
 
 //            std::ostringstream msg;
 //            rbException.print(msg);
@@ -499,10 +474,7 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
 
         if (result == 0)
         {
-
-#ifdef DEBUG_PARSER
-            printf("Parser successfully executed statement\n\n");
-#endif
+            // Parser successfully executed statement
         }
         else if (result == 2)
         {
@@ -515,11 +487,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
         }
         else if (foundErrorBeforeEnd == true)
         {
-
-#ifdef DEBUG_PARSER
-            printf("Syntax error detected by parser\n");
-            printf("Parser discarding any remaining parts of command buffer\n\n");
-#endif
 
             std::ostringstream msg;
             if (yylloc.first_column == yylloc.last_column)
@@ -545,10 +512,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
         else if (foundNewline == true && foundEOF == false)
         {
 
-#ifdef DEBUG_PARSER     
-            printf("Incomplete statement ending with inappropriate newline; replaced with space\n");
-#endif
-
             /* Replace newline with space */
             std::string temp = (*i);
             temp[temp.size() - 1] = ' ';
@@ -559,9 +522,6 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
             {
 
                 /* If no more input lines, we need to ask for more */
-#ifdef DEBUG_PARSER
-                printf("Reached end; asking for more content to append to (last) statement.\n\n");
-#endif
                 command = temp;
                 return 1;
             }
@@ -569,18 +529,11 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
             {
 
                 /* If more input lines, put temp in front before proceeding */
-#ifdef DEBUG_PARSER
-                printf("Continuing with next Rev line in command buffer.\n\n");
-#endif
                 (*j) = temp + (*j);
             }
         }
         else if (foundNewline == true && foundEOF == true)
         {
-
-#ifdef DEBUG_PARSER
-            printf("Incomplete statement ending with appropriate newline.\n");
-#endif
 
             std::list<std::string>::iterator j = i;
             j++;
@@ -588,24 +541,16 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
             {
 
                 /* If no more input lines, we need to ask for more */
-#ifdef DEBUG_PARSER
-                printf("Reached end; asking for more content to append to (last) statement.\n\n");
-#endif
                 command = (*i);
                 return 1;
             } else {
 
                 /* If more input lines, put current line in front before proceeding */
-#ifdef DEBUG_PARSER
-                printf("Continuing with next Rev line in command buffer.\n\n");
-#endif
                 (*j) = (*i) + (*j);
             }
-        } else {
-
-#ifdef DEBUG_PARSER
-            printf("Unknown parse error\n");
-#endif
+        }
+        else
+        {
 
             RBOUT("Unknown parse error");
             command = "";
@@ -618,7 +563,8 @@ int RevLanguage::Parser::processCommand(std::string& command, Environment* env) 
     return 0;
 }
 
-ParserInfo Parser::checkCommand(std::string& command, Environment* env) {
+ParserInfo Parser::checkCommand(std::string& command, Environment* env)
+{
 
     setParserMode(CHECKING);
     executionEnvironment = env;
@@ -627,13 +573,17 @@ ParserInfo Parser::checkCommand(std::string& command, Environment* env) {
 
     // Break command into Rev lines
     std::list<std::string> lines;
-    try {
+    try
+    {
         pi = breakIntoLines(command, lines, false);
-    }    catch (RbException& rbException) {
+    }
+    catch (RbException& rbException)
+    {
         pi.message.append("Caught an exception while breaking command buffer into lines\n\r");
         // unrecoverable error        
         // We return 2 to signal a problem, which the caller may choose to ignore or act upon
         pi.result = 2;
+        
         return pi;
     }
 
@@ -641,7 +591,8 @@ ParserInfo Parser::checkCommand(std::string& command, Environment* env) {
     yycolumn = 1;
 
     // Call Bison code, which calls Flex code, which calls rrinput
-    for (std::list<std::string>::iterator i = lines.begin(); i != lines.end(); i++) {
+    for (std::list<std::string>::iterator i = lines.begin(); i != lines.end(); i++)
+    {
         pi.functionName = functionName;
         pi.baseVariable = NULL;
         pi.argumentLabel = argumentLabel;
@@ -658,12 +609,16 @@ ParserInfo Parser::checkCommand(std::string& command, Environment* env) {
         pi.message.append("\n\rCalling bison with rrcommand:\n\r").append(rrcommand.str()).append("\n\r");
 
         int result;
-        try {
+        try
+        {
             result = yyparse();
-        }        catch (RbException& rbException) {
+        }
+        catch (RbException& rbException)
+        {
             pi.message.append("Caught an exception calling yyparse\n\r");
             // Catch a quit request in case it was not caught before
-            if (rbException.getExceptionType() == RbException::QUIT) {
+            if (rbException.getExceptionType() == RbException::QUIT)
+            {
                 pi.message.append("ignoring QUIT request");
             }
             // All other uncaught exceptions
@@ -674,7 +629,8 @@ ParserInfo Parser::checkCommand(std::string& command, Environment* env) {
             continue;
         }
 
-        if (result == 0 || result == 1) {
+        if (result == 0 || result == 1)
+        {
 
             pi.functionName = functionName;
             pi.baseVariable = baseVariable;
@@ -687,7 +643,8 @@ ParserInfo Parser::checkCommand(std::string& command, Environment* env) {
             continue;
         }
 
-        if (foundNewline == true && foundEOF == false) {
+        if (foundNewline == true && foundEOF == false)
+        {
             pi.message.append("Incomplete statement ending with inappropriate newline; replaced with space\n\r");
 
             /* Replace newline with space */
@@ -696,44 +653,57 @@ ParserInfo Parser::checkCommand(std::string& command, Environment* env) {
 
             std::list<std::string>::iterator j = i;
             j++;
-            if (j == lines.end()) {
+            if (j == lines.end())
+            {
                 /* If no more input lines, we need to ask for more */
                 pi.message.append("Reached end; asking for more content to append to (last) statement.\n\r\n\r");
                 command = temp;
                 pi.result = 1;
                 return pi;
-            } else {
+            }
+            else
+            {
                 /* If more input lines, put temp in front before proceeding */
                 pi.message.append("Continuing with next Rev line in command buffer.\n\r\n\r");
                 (*j) = temp + (*j);
             }
-        } else if (foundNewline == true && foundEOF == true) {
+            
+        } else if (foundNewline == true && foundEOF == true)
+        {
             pi.message.append("Incomplete statement ending with appropriate newline.\n\r");
             std::list<std::string>::iterator j = i;
             j++;
-            if (j == lines.end()) {
+            if (j == lines.end())
+            {
                 /* If no more input lines, we need to ask for more */
                 pi.message.append("Reached end; asking for more content to append to (last) statement.\n\r\n\r");
                 command = (*i);
                 pi.result = 1;
                 return pi;
-            } else {
+            }
+            else
+            {
                 /* If more input lines, put current line in front before proceeding */
                 pi.message.append("Continuing with next Rev line in command buffer.\n\r\n\r");
                 (*j) = (*i) + (*j);
             }
+            
         }
+        
     }
 
     // make sure executing mode is set by default
     setParserMode(EXECUTING);
+    
     return pi;
 }
 
 /** Global call-back function for the flex-generated code in lex.yy.cpp */
-void rrinput(char* buf, size_t& result, size_t maxsize) {
+void rrinput(char* buf, size_t& result, size_t maxsize)
+{
 
     buf[0] = '\0';
     RevLanguage::Parser::getParser().getline(buf, maxsize);
     result = strlen(buf);
+    
 }

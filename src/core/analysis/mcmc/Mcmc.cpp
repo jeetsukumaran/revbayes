@@ -804,8 +804,6 @@ void Mcmc::setLikelihoodHeat(double h)
 void Mcmc::setNumberOfProcessesSpecialized(size_t n, size_t offset)
 {
     
-    std::cerr << "Running MCMC with " << n << " processes to compute the likelihood." << std::endl;
-    
     // delegate the call to the model
     model.setNumberOfProcesses(n,offset);
 }
@@ -886,7 +884,7 @@ void Mcmc::startMonitors( size_t numCycles )
         
         
         // if this chain is active, print the header
-        if (chainActive)
+        if ( chainActive == true )
         {
             monitors[i].openStream();
             monitors[i].printHeader();
