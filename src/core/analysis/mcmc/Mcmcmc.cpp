@@ -68,6 +68,7 @@ Mcmcmc::Mcmcmc(const Model& m, const RbVector<Move> &mv, const RbVector<Monitor>
             // create chains
             // @Michael: Why do we need to create new objects??? (Sebastian)
             Mcmc* oneChain = new Mcmc( *baseChain );
+            oneChain->setChainActive( i == 0 );
             oneChain->setScheduleType( scheduleType );
             oneChain->setChainPosteriorHeat( b );
             oneChain->setChainIndex( i );
@@ -79,6 +80,7 @@ Mcmcmc::Mcmcmc(const Model& m, const RbVector<Move> &mv, const RbVector<Monitor>
         {
             chains[i] = NULL;
         }
+        
     }
     
 }
@@ -91,7 +93,7 @@ Mcmcmc::Mcmcmc(const Mcmcmc &m) : MonteCarloSampler(m)
     numProcesses        = m.numProcesses;
     heatRanks           = m.heatRanks;
     swapInterval        = m.swapInterval;
-    coldChainIndex    = m.coldChainIndex;
+    coldChainIndex      = m.coldChainIndex;
     scheduleType        = m.scheduleType;
     
     numAttemptedSwaps   = m.numAttemptedSwaps;
@@ -443,16 +445,10 @@ void Mcmcmc::startMonitors(size_t numCycles)
     for (size_t i = 0; i < numChains; i++)
     {
         
-        if (pidOfChain[i] != pid)
+        if ( pidOfChain[i] == pid )
         {
+            // start the monitors for each chain
             chains[i]->startMonitors( numCycles );
-            
-        
-            // monitor chain activeIndex only
-            if (chains[i]->isChainActive() )
-            {
-                chains[i]->monitor(0);
-            }
             
         }
         
