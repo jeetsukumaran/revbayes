@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ostream>
 
-#ifdef AP_MPI
+#ifdef RB_MPI
 #include <mpi.h>
 #endif
 
@@ -32,7 +32,7 @@ namespace RevBayesCore {
         RbOutputStream& operator<<(const T& x)
         {
             size_t pid = 0;
-#ifdef AP_MPI
+#ifdef RB_MPI
             pid = MPI::COMM_WORLD.Get_rank();
 #endif
             if ( pid == 0 )
@@ -46,15 +46,13 @@ namespace RevBayesCore {
         RbOutputStream& operator<<( std::ostream&(*f)(std::ostream&) )
         {
             size_t pid = 0;
-#ifdef AP_MPI
+#ifdef RB_MPI
             pid = MPI::COMM_WORLD.Get_rank();
 #endif
             if ( pid == 0 )
             {
                 std::cout << f;
             }
-            
-            return *this;
             
             return *this;
         }
