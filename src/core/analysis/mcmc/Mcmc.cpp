@@ -450,6 +450,7 @@ void Mcmc::initializeMonitors(void)
     for (size_t i=0; i<monitors.size(); i++)
     {
         monitors[i].setModel( &model );
+        monitors[i].setMcmc( this );
     }
 }
 

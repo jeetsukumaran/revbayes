@@ -28,6 +28,7 @@ namespace RevBayesCore {
 
     class DagNode;
     class Mcmc;
+    class Mcmcmc;
     class Model;
 
     class Monitor : public Cloneable {
@@ -64,6 +65,8 @@ namespace RevBayesCore {
 //        void                                        setDagNodes(const std::set<DagNode *>& args);
         void                                        setDagNodes(const std::vector<DagNode *>& args);
         void                                        setMcmc(Mcmc* m);
+        void                                        setMcmcmc(Mcmcmc* m);
+        
 
     protected:
     
@@ -72,6 +75,7 @@ namespace RevBayesCore {
         // parameters
         unsigned long                               printgen;
         Mcmc*                                       mcmc;
+        Mcmcmc*                                     mcmcmc;
         std::vector<DagNode *>                      nodes;
         const Model*                                model;
     };

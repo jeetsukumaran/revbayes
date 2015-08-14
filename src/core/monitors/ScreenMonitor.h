@@ -33,7 +33,7 @@ namespace RevBayesCore {
     public:
         // Constructors and Destructors
         ScreenMonitor(DagNode *n, int g, bool pp=true, bool l=true, bool pr=true);                                                                //!< Constructor with single DAG node
-        ScreenMonitor(const std::vector<DagNode *> &n, int g, bool pp=true, bool l=true, bool pr=true);                                              //!< Constructor with vector of DAG node
+        ScreenMonitor(const std::vector<DagNode *> &n, int g, bool pp=true, bool l=true, bool pr=true, bool pci=false);                                              //!< Constructor with vector of DAG node
         
         // basic methods
         ScreenMonitor*                      clone(void) const;                                                  //!< Clone the object
@@ -54,6 +54,7 @@ namespace RevBayesCore {
         bool                                likelihood;
         bool                                printWaitingTime;
         bool                                printElapsedTime;
+        bool                                printChainIndex;
         std::string                         prefixSeparator;
         std::string                         suffixSeparator;
         size_t                              headerPrintingInterval;
