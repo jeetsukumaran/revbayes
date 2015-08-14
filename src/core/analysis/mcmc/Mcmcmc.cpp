@@ -20,6 +20,7 @@ Mcmcmc::Mcmcmc(const Model& m, const RbVector<Move> &mv, const RbVector<Monitor>
     scheduleType(sT),
     currentGeneration(0),
     swapInterval(si),
+    mcmcmcMasterPID( 0 ),
     coldChainIndex( 0 ),
     delta( dt ),
     generation( 0 ),
