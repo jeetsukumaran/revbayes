@@ -289,9 +289,9 @@ RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::AbstractPhyl
     pInv                        = new ConstantNode<double>("pInv", new double(0.0) );
     
     // compute which block of the data this process needs to compute
-    pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
-    pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
-    pattern_block_size  = pattern_block_end - pattern_block_start;
+//    pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
+//    pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
+//    pattern_block_size  = pattern_block_end - pattern_block_start;
     
     // flags specifying which model variants we use
     branchHeterogeneousClockRates               = false;
@@ -585,9 +585,9 @@ void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::compres
     
     
     // compute which block of the data this process needs to compute
-    pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
-    pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
-    pattern_block_size  = pattern_block_end - pattern_block_start;
+//    pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
+//    pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
+//    pattern_block_size  = pattern_block_end - pattern_block_start;
     
     
     // allocate and fill the cells of the matrices
@@ -1850,10 +1850,10 @@ void RevBayesCore::AbstractPhyloCTMCSiteHomogeneous<charType, treeType>::setNumb
 {
     
     // compute which block of the data this process needs to compute
-    pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
-    pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
-    pattern_block_size  = pattern_block_end - pattern_block_start;
-    
+//    pattern_block_start = size_t(floor( (double(pid)   / numProcesses ) * numPatterns) );
+//    pattern_block_end   = size_t(floor( (double(pid+1) / numProcesses ) * numPatterns) );
+//    pattern_block_size  = pattern_block_end - pattern_block_start;
+//    
     // we need to recompress the data
     this->compress();
 }
