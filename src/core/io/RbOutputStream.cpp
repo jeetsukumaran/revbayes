@@ -1,4 +1,4 @@
-#ifdef AP_MPI
+#ifdef RB_MPI
 #include <mpi.h>
 #endif
 
@@ -16,7 +16,7 @@ RbOutputStream::RbOutputStream( void )
 //{
 //    
 //    size_t pid = 0;
-//#ifdef AP_MPI
+//#ifdef RB_MPI
 //    pid = MPI::COMM_WORLD.Get_rank();
 //#endif
 //    if ( pid == 0 )
