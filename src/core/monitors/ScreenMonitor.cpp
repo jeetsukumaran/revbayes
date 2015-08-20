@@ -20,6 +20,7 @@
 #include "DagNode.h"
 #include "Model.h"
 #include "Monitor.h"
+#include "RlUserInterface.h"
 #include "StringUtilities.h"
 
 #include <cmath>
@@ -92,10 +93,8 @@ void ScreenMonitor::monitor(unsigned long gen)
         
         if ( gen > 0 && gen % (headerPrintingInterval*samplingFrequency) == 0 )
         {
-            std::cout << std::endl;
             printHeader();
         }
-        
         
         if (gen % samplingFrequency == 0)
         {
@@ -109,12 +108,15 @@ void ScreenMonitor::monitor(unsigned long gen)
             // set cycle column width
             int cycleWidth = floor( log10( numCycles ) ) + 1;
             cycleWidth = 9 > cycleWidth ? 9 : cycleWidth;
+            
+            // final string to print for this iteration
+            std::string output = "";
 
             // print the cycle number
             ss << gen;
             s = ss.str();
             StringUtilities::fillWithSpaces(s, cycleWidth, true);
-            std::cout << s << suffixSeparator;
+            output = s + suffixSeparator;
             ss.str("");
 
             if ( posterior )
@@ -129,7 +131,7 @@ void ScreenMonitor::monitor(unsigned long gen)
                 ss << pp;
                 s = ss.str();
                 StringUtilities::fillWithSpaces( s, columnWidth, false );
-                std::cout << prefixSeparator << s << suffixSeparator;
+                output += prefixSeparator + s + suffixSeparator;
                 ss.str("");
             }
             
@@ -148,7 +150,7 @@ void ScreenMonitor::monitor(unsigned long gen)
                 ss << pp;
                 s = ss.str();
                 StringUtilities::fillWithSpaces( s, columnWidth, false );
-                std::cout << prefixSeparator << s << suffixSeparator;
+                output += prefixSeparator + s + suffixSeparator;
                 ss.str("");
             }
             
@@ -167,7 +169,7 @@ void ScreenMonitor::monitor(unsigned long gen)
                 ss << pp;
                 s = ss.str();
                 StringUtilities::fillWithSpaces( s, columnWidth, false );
-                std::cout << prefixSeparator << s << suffixSeparator;
+                output += prefixSeparator + s + suffixSeparator;
                 ss.str("");
             }
             
@@ -178,7 +180,7 @@ void ScreenMonitor::monitor(unsigned long gen)
                 
                 // print the value
                 node->printValueElements(ss, prefixSeparator + suffixSeparator, int( columnWidth ), false);
-                std::cout << prefixSeparator << ss.str() << suffixSeparator;
+                output += prefixSeparator + ss.str() + suffixSeparator;
                 ss.str("");
             }
             
@@ -195,7 +197,7 @@ void ScreenMonitor::monitor(unsigned long gen)
                 ss << std::setw( 2 ) << std::setfill( '0' ) << minutes << ":";
                 ss << std::setw( 2 ) << std::setfill( '0' ) << seconds;
                 
-                std::cout << prefixSeparator << ss.str() << suffixSeparator;
+                output += prefixSeparator + ss.str() + suffixSeparator;
                 ss.str("");
                 
             }
@@ -205,7 +207,7 @@ void ScreenMonitor::monitor(unsigned long gen)
 
                 if ( (gen-startGen) <= samplingFrequency )
                 {
-                    std::cout << prefixSeparator << "--:--:--" << suffixSeparator;
+                    output += prefixSeparator + "--:--:--" + suffixSeparator;
                 }
                 else
                 {
@@ -224,13 +226,12 @@ void ScreenMonitor::monitor(unsigned long gen)
                     ss << std::setw( 2 ) << std::setfill( '0' ) << minutes << ":";
                     ss << std::setw( 2 ) << std::setfill( '0' ) << seconds;
                 
-                    std::cout << prefixSeparator << ss.str() << suffixSeparator;
+                    output += prefixSeparator + ss.str() + suffixSeparator;
                 }
             
             }
         
-            std::cout << std::endl;
-            std::cout.flush();
+            RevLanguage::UserInterface::userInterface().output(output, false);
         
         }
         
@@ -246,7 +247,7 @@ void ScreenMonitor::printHeader( void )
     if ( enabled == true )
     {
         // print empty line first
-        std::cout << std::endl;
+        RevLanguage::UserInterface::userInterface().output("\n", false);
     
         // print everything to a string stream
         std::stringstream ss;
@@ -322,14 +323,14 @@ void ScreenMonitor::printHeader( void )
             ss << prefixSeparator << header << suffixSeparator;
         }
 
-        std::cout << ss.str() << std::endl;
-
+        RevLanguage::UserInterface::userInterface().output(ss.str(), false);
+        
+        std::string dashes = "";
         for (size_t i=0; i<ss.str().size(); ++i)
         {
-            std::cout << "-";
+            dashes += "-";
         }
-    
-        std::cout << std::endl;
+        RevLanguage::UserInterface::userInterface().output(dashes, false);
         
     } // end if enabled
     
