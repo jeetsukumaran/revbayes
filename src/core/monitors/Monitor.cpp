@@ -1,6 +1,5 @@
 #include "DagNode.h"
 #include "Mcmc.h"
-#include "Mcmcmc.h"
 #include "Monitor.h"
 #include "RbException.h"
 #include "StringUtilities.h"
@@ -263,11 +262,6 @@ void Monitor::setModel(Model *m)
 void Monitor::setMcmc(Mcmc *m)
 {
     mcmc = m;
-}
-
-void Monitor::setMcmcmc(Mcmcmc *m)
-{
-    mcmcmc = m;
 }
 
 

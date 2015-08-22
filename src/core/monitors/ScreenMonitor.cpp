@@ -18,6 +18,7 @@
 
 #include "ScreenMonitor.h"
 #include "DagNode.h"
+#include "Mcmc.h"
 #include "Model.h"
 #include "Monitor.h"
 #include "RlUserInterface.h"
@@ -37,7 +38,7 @@ ScreenMonitor::ScreenMonitor(DagNode *n, int g, bool pp, bool l, bool pr) : Moni
     likelihood( l ),
     printWaitingTime( true ),
     printElapsedTime( true ),
-    printChainIndex( false ),
+    printChainIndex( true ),
     prefixSeparator("   "),
     suffixSeparator("   |"),
     headerPrintingInterval( 20 ),
@@ -58,7 +59,8 @@ ScreenMonitor::ScreenMonitor(const std::vector<DagNode *> &n, int g, bool pp, bo
     likelihood( l ),
     printWaitingTime( true ),
     printElapsedTime( true ),
-    printChainIndex( pci ),
+//    printChainIndex( pci ),
+    printChainIndex( true ),   // TODO modify revfunction to set this value
     prefixSeparator("   "),
     suffixSeparator("   |"),
     headerPrintingInterval( 20 ),
@@ -86,8 +88,8 @@ ScreenMonitor* ScreenMonitor::clone(void) const
 void ScreenMonitor::monitor(unsigned long gen)
 {
 
-    // only the enabled monitor is allowed to print
-    if ( enabled == true )
+    // only the enabled replacte and the cold chain is allowed to print
+    if ( enabled == true  && mcmc->getChainPosteriorHeat() == 1.0 )
     {
         
         // get the printing frequency
@@ -121,6 +123,15 @@ void ScreenMonitor::monitor(unsigned long gen)
             output = s + suffixSeparator;
             ss.str("");
 
+            if ( printChainIndex )
+            {
+                ss << mcmc->getChainIndex();
+                s = ss.str();
+                StringUtilities::fillWithSpaces( s, columnWidth, false );
+                output += prefixSeparator + s + suffixSeparator;
+                ss.str("");
+            }
+            
             if ( posterior )
             {
                 const std::vector<DagNode*> &n = model->getDagNodes();
@@ -233,7 +244,7 @@ void ScreenMonitor::monitor(unsigned long gen)
             
             }
         
-            RevLanguage::UserInterface::userInterface().output(output, false);
+            RBOUT(output);
         
         }
         
@@ -246,10 +257,11 @@ void ScreenMonitor::monitor(unsigned long gen)
 /** Print header for monitored values */
 void ScreenMonitor::printHeader( void )
 {
-    if ( enabled == true )
+    // only print header for cold chains and the enable replicate
+    if ( enabled == true && mcmc->getChainPosteriorHeat() == 1.0)
     {
         // print empty line first
-        RevLanguage::UserInterface::userInterface().output("\n", false);
+        RBOUT("\n");
     
         // print everything to a string stream
         std::stringstream ss;
@@ -267,6 +279,13 @@ void ScreenMonitor::printHeader( void )
         StringUtilities::fillWithSpaces( header, width, true );
         ss << header << suffixSeparator;
     
+        if ( printChainIndex )
+        {
+            header = "Chain Index";
+            StringUtilities::fillWithSpaces( header, columnWidth, false );
+            ss << prefixSeparator << header << suffixSeparator;
+        }
+        
         if ( posterior )
         {
             header = "Posterior";
@@ -325,14 +344,14 @@ void ScreenMonitor::printHeader( void )
             ss << prefixSeparator << header << suffixSeparator;
         }
 
-        RevLanguage::UserInterface::userInterface().output(ss.str(), false);
+        RBOUT(ss.str());
         
         std::string dashes = "";
         for (size_t i=0; i<ss.str().size(); ++i)
         {
             dashes += "-";
         }
-        RevLanguage::UserInterface::userInterface().output(dashes, false);
+        RBOUT(dashes);
         
     } // end if enabled
     

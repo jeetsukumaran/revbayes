@@ -1,4 +1,5 @@
 #include "MonteCarloAnalysis.h"
+#include "RbUtil.h"
 #include "RlUserInterface.h"
 
 
@@ -151,22 +152,43 @@ void MonteCarloAnalysis::burnin(size_t generations, size_t tuningInterval)
     RBOUT( ss.str() );
         
     // Print progress bar (68 characters wide)
-    std::cout << std::endl;
-    std::cout << "Progress:" << std::endl;
-    std::cout << "0---------------25---------------50---------------75--------------100" << std::endl;
-    std::cout.flush();
+    ss.str("");
+    ss << std::endl;
+    ss << "Progress:" << std::endl;
+    ss << "0---------------25---------------50---------------75--------------100";
+    RBOUT( ss.str() );
     
     
     // Run the chain
     size_t numStars = 0;
+#ifdef RB_MPI
+    if ( pid == 0 )
+    {
+        std::cout << RevBayesCore::RbUtils::PAD;
+        std::cout.flush();
+    }
+#else
+    std::cout << RevBayesCore::RbUtils::PAD;
+    std::cout.flush();
+#endif
     for (size_t k=1; k<=generations; k++)
     {
         size_t progress = 68 * (double) k / (double) generations;
         if ( progress > numStars )
         {
+            // dont use RBOUT because we need to flush output
+#ifdef RB_MPI
+            if ( pid == 0 )
+            {
+                for ( ;  numStars < progress; ++numStars )
+                    std::cout << "*";
+                std::cout.flush();
+            }
+#else
             for ( ;  numStars < progress; ++numStars )
                 std::cout << "*";
             std::cout.flush();
+#endif
         }
         
         for (size_t i=0; i<replicates; ++i)
